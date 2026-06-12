@@ -113,7 +113,7 @@ h1 span {
 
 .toolbar {
   display: grid;
-  grid-template-columns: minmax(180px, 1fr) minmax(150px, 220px) minmax(150px, 220px);
+  grid-template-columns: minmax(180px, 1fr) minmax(150px, 220px);
   gap: 0;
   padding: 0;
   border-bottom: 1px solid var(--line);
@@ -170,7 +170,7 @@ input:focus {
 .list-head,
 .archive-row {
   display: grid;
-  grid-template-columns: 56px minmax(220px, 2fr) minmax(140px, 1fr) 140px 140px 180px;
+  grid-template-columns: 56px minmax(220px, 2fr) minmax(140px, 1fr) 140px;
   gap: 12px;
   align-items: center;
 }
@@ -217,42 +217,6 @@ input:focus {
   font-weight: var(--type-weight);
   line-height: 1.32;
   text-transform: uppercase;
-}
-
-.status {
-  color: var(--muted);
-  font-size: var(--type-size);
-  font-weight: var(--type-weight);
-  text-transform: uppercase;
-}
-
-.status-needs_review,
-.status-pending,
-.status-needs_capture,
-.status-review-needed,
-.status-recapture-needed,
-.status-partial {
-  color: var(--warn);
-}
-
-.status-archived,
-.status-ok {
-  color: var(--accent);
-}
-
-.row-links {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px 12px;
-  text-transform: uppercase;
-}
-
-.row-links a {
-  text-decoration: underline;
-}
-
-.row-links span {
-  color: var(--muted);
 }
 
 .empty {

@@ -154,8 +154,9 @@ def run_crawl(args: argparse.Namespace, row: dict[str, str], out_dir: Path) -> P
     row["wacz_file"] = wacz_file
     row["archived_date"] = datetime.now(timezone.utc).date().isoformat()
     row["sha256"] = sha256(target)
-    # 캡처 성공과 재생 성공은 다르다: 운영자가 재생을 확인한 뒤 직접 ok로 바꾼다.
-    row["status"] = "review-needed"
+    # 크롤 성공 시 바로 공개한다. 재생에 문제가 발견되면 운영자가 사후에
+    # recapture-needed로 내려 다음 실행에서 다시 캡처한다.
+    row["status"] = "ok"
     return target
 
 

@@ -2,14 +2,12 @@ const state = {
   rows: [],
   query: "",
   semester: "",
-  status: "",
 };
 
 const list = document.getElementById("archive-list");
 const empty = document.getElementById("empty-state");
 const search = document.getElementById("search");
 const semester = document.getElementById("semester");
-const statusFilter = document.getElementById("status");
 const itemCount = document.getElementById("item-count");
 const semesterCount = document.getElementById("semester-count");
 
@@ -17,17 +15,16 @@ function clean(value) {
   return String(value || "").trim();
 }
 
-// 상태값 규칙(운영 가이드 4.6): ok 공개, partial 공개+주석, review-needed 조건부
-// 공개(재생 비활성), recapture-needed/private 숨김.
+// 비공개/재캡처 대상은 외부 공개 색인에서 숨긴다.
 const HIDDEN_STATUSES = new Set(["recapture-needed", "private"]);
-const PLAYABLE_STATUSES = new Set(["ok", "partial", "archived"]);
 
 function status(row) {
   return clean(row.status).toLowerCase() || "pending";
 }
 
-function isVisible(row) {
-  return !HIDDEN_STATUSES.has(status(row));
+// 공개 사이트에는 재생 가능한 보존본만 노출한다.
+function isPublic(row) {
+  return Boolean(clean(row.wacz_url)) && !HIDDEN_STATUSES.has(status(row));
 }
 
 function matches(row) {
@@ -40,9 +37,8 @@ function matches(row) {
     row.notes,
   ].map(clean).join(" ").toLowerCase();
 
-  return isVisible(row) &&
+  return isPublic(row) &&
     (!state.semester || row.semester === state.semester) &&
-    (!state.status || status(row) === state.status) &&
     (!q || haystack.includes(q));
 }
 
@@ -57,7 +53,7 @@ function viewerUrl(row) {
 }
 
 function renderSummary() {
-  const rows = state.rows.filter(isVisible);
+  const rows = state.rows.filter(isPublic);
   const semesters = new Set(rows.map((row) => clean(row.semester)).filter(Boolean));
   itemCount.textContent = `${rows.length} works`;
   semesterCount.textContent = `${semesters.size} semesters`;
@@ -65,7 +61,7 @@ function renderSummary() {
 
 function renderSemesterOptions() {
   const semesters = Array.from(
-    new Set(state.rows.filter(isVisible).map((row) => clean(row.semester)).filter(Boolean))
+    new Set(state.rows.filter(isPublic).map((row) => clean(row.semester)).filter(Boolean))
   ).sort().reverse();
   for (const value of semesters) {
     const option = document.createElement("option");
@@ -75,31 +71,15 @@ function renderSemesterOptions() {
   }
 }
 
-function renderStatusOptions() {
-  const statuses = Array.from(
-    new Set(state.rows.map(status).filter((value) => !HIDDEN_STATUSES.has(value)))
-  ).sort();
-
-  for (const value of statuses) {
-    const option = document.createElement("option");
-    option.value = value;
-    option.textContent = value;
-    statusFilter.appendChild(option);
-  }
-}
-
 function renderRows() {
   list.innerHTML = "";
   const rows = state.rows.filter(matches);
   empty.hidden = rows.length > 0;
 
   rows.forEach((row, index) => {
-    const hasArchive = Boolean(clean(row.wacz_url));
-    const playable = hasArchive && PLAYABLE_STATUSES.has(status(row));
-    const reviewable = hasArchive && status(row) === "review-needed";
-    const item = document.createElement("div");
+    const item = document.createElement("a");
     item.className = "archive-row";
-    if (!hasArchive && !clean(row.original_url)) item.classList.add("is-disabled");
+    item.href = viewerUrl(row);
     if (clean(row.notes)) item.title = clean(row.notes);
 
     const number = document.createElement("span");
@@ -116,34 +96,7 @@ function renderRows() {
     const term = document.createElement("span");
     term.textContent = clean(row.semester) || "-";
 
-    const statusCell = document.createElement("span");
-    statusCell.className = `status status-${status(row)}`;
-    statusCell.textContent = status(row);
-
-    const links = document.createElement("span");
-    links.className = "row-links";
-
-    if (clean(row.original_url)) {
-      const original = document.createElement("a");
-      original.href = clean(row.original_url);
-      original.target = "_blank";
-      original.rel = "noopener";
-      original.textContent = "Original";
-      links.appendChild(original);
-    }
-
-    if (playable || reviewable) {
-      const archive = document.createElement("a");
-      archive.href = viewerUrl(row);
-      archive.textContent = playable ? "Archive" : "Review";
-      links.appendChild(archive);
-    } else if (!hasArchive) {
-      const missing = document.createElement("span");
-      missing.textContent = "No WACZ";
-      links.appendChild(missing);
-    }
-
-    item.append(number, work, student, term, statusCell, links);
+    item.append(number, work, student, term);
     list.appendChild(item);
   });
 }
@@ -157,7 +110,6 @@ fetch("index.json", { cache: "no-store" })
     state.rows = Array.isArray(rows) ? rows : [];
     renderSummary();
     renderSemesterOptions();
-    renderStatusOptions();
     renderRows();
   })
   .catch(() => {
@@ -172,10 +124,5 @@ search.addEventListener("input", (event) => {
 
 semester.addEventListener("change", (event) => {
   state.semester = event.target.value;
-  renderRows();
-});
-
-statusFilter.addEventListener("change", (event) => {
-  state.status = event.target.value;
   renderRows();
 });
