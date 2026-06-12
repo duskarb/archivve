@@ -1,0 +1,240 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>웹 작업물 아카이브 — 진행 및 관리 문서</title>
+<style>
+  /* Pretendard Regular 12px 검은색으로 고정 */
+  @import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css");
+
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    font-family: "Pretendard", sans-serif;
+    font-weight: 400;          /* Regular 고정 */
+    font-size: 12px;           /* 12px 고정 */
+    line-height: 1.8;
+    color: #000000;            /* 검은색 고정 */
+    background: #ffffff;
+    margin: 0;
+    padding: 56px 28px 96px;
+  }
+  /* 모든 텍스트 요소를 동일하게 고정 */
+  h1, h2, h3, p, li, td, th, a, code, pre, div, span, strong, em {
+    font-family: "Pretendard", sans-serif;
+    font-weight: 400;
+    font-size: 12px;
+    color: #000000;
+    font-style: normal;
+  }
+  .wrap { max-width: 720px; margin: 0 auto; }
+
+  .doc-title { letter-spacing: 0.04em; }
+  .meta { margin-top: 4px; }
+
+  hr { border: none; border-top: 1px solid #000; margin: 28px 0; }
+  .rule-thin { border-top: 1px solid #d9d9d9; margin: 20px 0; }
+
+  .section-label {
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    margin: 40px 0 14px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid #000;
+  }
+  .sub { letter-spacing: 0.06em; margin: 22px 0 8px; }
+
+  p { margin: 0 0 12px; }
+  ul, ol { margin: 0 0 12px; padding-left: 18px; }
+  li { margin: 0 0 6px; }
+
+  table { width: 100%; border-collapse: collapse; margin: 6px 0 16px; }
+  th, td { border: 1px solid #c9c9c9; padding: 7px 9px; vertical-align: top; text-align: left; }
+
+  code {
+    background: #f2f2f2;
+    padding: 1px 4px;
+    border-radius: 2px;
+  }
+  pre {
+    background: #f5f5f5;
+    border: 1px solid #e0e0e0;
+    border-radius: 3px;
+    padding: 12px 14px;
+    overflow-x: auto;
+    line-height: 1.6;
+    margin: 0 0 14px;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+  a { text-decoration: underline; }
+
+  .note-box { border: 1px solid #000; padding: 12px 14px; margin: 0 0 14px; }
+  .toc li { margin: 0 0 4px; }
+  .footer { margin-top: 48px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="doc-title">KAIST 디자인 스튜디오 I — 학생 웹 작업물 아카이브</div>
+  <div class="meta">진행 및 관리 문서 (Project Log &amp; Operations Handbook)</div>
+  <div class="meta">최종 갱신: 2026-06-12 · 대상 학기: 2026-spring</div>
+
+  <hr>
+
+  <div class="section-label">0. 이 문서는</div>
+  <p>학생들의 웹 작업물을 캡처 시점 그대로 보존하기 위한 아카이브 시스템을, (1) 어떻게 만들고 진행해 왔는지, (2) 앞으로 어떻게 관리·운영하면 되는지 정리한 문서입니다. 담당자(교수·조교)가 바뀌어도 이 문서 하나로 이어받을 수 있도록 작성했습니다.</p>
+  <ul class="toc">
+    <li>1. 프로젝트 개요</li>
+    <li>2. 왜 이렇게 만들었나 (설계 배경)</li>
+    <li>3. 기술 구성</li>
+    <li>4. 어떻게 진행했나 (작업 경위)</li>
+    <li>5. 어떻게 관리하나 (운영 매뉴얼)</li>
+    <li>6. 현재 상태 요약</li>
+    <li>7. 자주 생기는 문제와 대응</li>
+    <li>8. 부록 — 폴더 구조 / 매니페스트 컬럼</li>
+  </ul>
+
+  <div class="section-label">1. 프로젝트 개요</div>
+  <p>목적은 단순합니다. 학생들이 만든 웹사이트(대부분 GitHub Pages 포트폴리오)는 졸업·호스팅 만료·계정 정리 등으로 <strong>언젠가 사라집니다.</strong> 살아 있을 때 통째로 박제해 두어, 학기가 끝나고 몇 년이 지나도 그 시점의 모습을 그대로 탐색할 수 있게 하는 것이 목표입니다.</p>
+  <p>규모는 학기당 약 35명이며, 매 학기 반복하고 가능한 한 오래 — 평생 단위로 — 운영하는 것을 전제로 합니다. 그래서 모든 선택의 기준은 "10년 뒤에도 살아 있을 기술인가"였습니다.</p>
+
+  <div class="section-label">2. 왜 이렇게 만들었나 (설계 배경)</div>
+  <p>처음 참고점은 Rhizome의 Conifer였지만, Conifer 서비스는 2026년 6월경 종료되었습니다(신규 가입은 2025년 12월 마감). 다행히 Conifer를 만든 Webrecorder 팀의 후속 도구들이 더 오래 가는 형태로 존재했고, 이 시스템은 그 도구들 위에 세웠습니다.</p>
+  <p>핵심 보존 원칙은 다음과 같습니다.</p>
+  <ul>
+    <li>개방형 표준만 쓴다 — 아카이브 포맷은 WARC/WACZ(국제표준). 특정 회사가 사라져도 열 수 있습니다.</li>
+    <li>서버에 의존하지 않는다 — 재생기는 브라우저 안에서 동작하므로, 정적 파일만 있으면 됩니다. 관리할 서버·DB가 없습니다.</li>
+    <li>프레임워크 churn을 피한다 — 사이트 본체는 빌드가 필요 없는 순수 HTML + 약간의 바닐라 JS. 썩을 빌드 단계가 없습니다.</li>
+    <li>사람이 읽는 단일 출처 — 누가 무엇을 언제 캡처했는지는 텍스트 파일(CSV) 하나로 관리합니다.</li>
+    <li>복제가 곧 보존이다 — 원본 WACZ는 여러 곳에 사본을 둡니다.</li>
+  </ul>
+
+  <div class="section-label">3. 기술 구성</div>
+  <table>
+    <tr><th>역할</th><th>사용 기술</th><th>한 줄 설명</th></tr>
+    <tr><td>캡처</td><td>browsertrix-crawler (Docker)</td><td>실제 브라우저로 사이트를 돌며 WACZ 하나로 패키징</td></tr>
+    <tr><td>보존 포맷</td><td>WACZ (WARC 기반)</td><td>국제표준 아카이브 포맷. ZIP으로 묶여 이동·보관 용이</td></tr>
+    <tr><td>재생</td><td>replayweb.page</td><td>서버 없이 브라우저에서 WACZ를 그대로 재생 (ui.js/sw.js 자가호스팅, 버전 고정)</td></tr>
+    <tr><td>색인/메타데이터</td><td>manifest.csv</td><td>학생·제목·URL·상태의 단일 출처. 빌드 시 index.json 생성</td></tr>
+    <tr><td>자동화</td><td>GitHub Actions</td><td>매니페스트 변경 → 캡처 → 배포까지 자동</td></tr>
+    <tr><td>호스팅</td><td>GitHub Pages</td><td>무료 정적 호스팅. 빌드 도구 불필요</td></tr>
+  </table>
+
+  <div class="section-label">4. 어떻게 진행했나 (작업 경위)</div>
+
+  <div class="sub">4.1 리포지토리 구성</div>
+  <p>코드(가벼운 텍스트)와 아카이브(무거운 WACZ)를 분리했습니다. WACZ는 <code>.gitignore</code>로 git 본문에서 제외하고, 빌드 때 <code>site/wacz/</code>로 모아 Pages에서 같은 출처로 재생합니다. 덕분에 리포 본체는 수 MB로 가볍습니다.</p>
+
+  <div class="sub">4.2 매니페스트 단일 출처</div>
+  <p>모든 것의 기준은 <code>manifest.csv</code> 한 파일입니다. 여기에 한 줄을 추가/수정하면, 자동화가 그 줄을 읽어 캡처하고 사이트 목록을 갱신합니다. 학생 목록은 이름 알파벳순으로 정렬해 두었습니다.</p>
+
+  <div class="sub">4.3 1차 캡처</div>
+  <p>학생들이 제출한 URL을 모아 일괄 캡처했습니다. 이 과정에서 대다수 작품이 정상 WACZ로 박제되었고, 압축 무결성 검사에서도 손상 없이 통과했습니다.</p>
+
+  <div class="sub">4.4 링크 깨짐 발견과 교정</div>
+  <p>1차 수집 때 URL을 스프레드시트(Numbers) 화면에서 눈으로 옮기는 과정에서 GitHub 아이디 철자가 한두 글자씩 틀린 경우가 다수 있었습니다(예: <code>brgnmoru</code> → <code>brgnmorum</code>, <code>s000j6</code> → <code>s000jing</code>, <code>yoandzhy</code> → <code>yoondzhy</code>). 틀린 주소로 캡처되면 빈 페이지가 박제됩니다.</p>
+  <p>이를 바로잡기 위해, 교수님이 주신 정본 링크 목록과 매니페스트를 한 줄씩 대조하고, <strong>교정한 URL이 실제로 살아 있는 학생 작품 페이지인지 전수 확인</strong>했습니다. URL이 비어 있던 일부 학생은 추정 주소가 실제로 정확한 것으로 확인되어 캡처 대기로 전환했습니다. 각 행의 <code>notes</code> 칸에 무엇을 왜 고쳤는지 기록해 두었습니다.</p>
+
+  <div class="sub">4.5 상태 정리</div>
+  <p>교정 결과, 정상 캡처되어 공개 중인 작품과, URL은 확정됐지만 (재)캡처가 필요한 작품, 그리고 아직 URL을 받지 못한 학생으로 구분해 매니페스트 상태값을 정리했습니다. 구체적 수치는 6장을 참고하세요.</p>
+
+  <div class="section-label">5. 어떻게 관리하나 (운영 매뉴얼)</div>
+
+  <div class="sub">5.1 학생·작품 추가하기</div>
+  <p><code>manifest.csv</code>에 한 줄을 추가합니다. 최소한 이름·제목·URL·학기를 채우고, 상태는 <code>pending</code>으로 둡니다. 나머지(파일명·해시·날짜)는 캡처 단계에서 자동으로 채워집니다.</p>
+
+  <div class="sub">5.2 상태값(status)의 의미</div>
+  <table>
+    <tr><th>status</th><th>의미</th><th>사이트 노출</th></tr>
+    <tr><td>ok</td><td>정상 캡처 완료, 재생 가능</td><td>공개됨</td></tr>
+    <tr><td>pending</td><td>아직 캡처 전 (또는 URL 대기)</td><td>숨김</td></tr>
+    <tr><td>recapture-needed</td><td>다시 캡처가 필요함</td><td>숨김</td></tr>
+    <tr><td>private</td><td>학생 요청·저작권·개인정보 등으로 비공개</td><td>숨김 (색인에서도 제외)</td></tr>
+  </table>
+  <p>비어 있는 <code>wacz_file</code> 행은 자동으로 사이트에 노출되지 않으므로, 캡처 전 학생이 목록에 잘못 뜰 걱정은 없습니다.</p>
+
+  <div class="sub">5.3 캡처 실행하기</div>
+  <p>GitHub 저장소의 Actions 탭에서 <strong>"Archive student sites"</strong> 워크플로우를 실행합니다. <code>mode</code>를 <code>pending</code>으로 두면 아직 캡처되지 않은(대기 중) 학생만 골라 캡처합니다. 필요하면 학기·이름 필터, 페이지 수·크롤 깊이도 지정할 수 있습니다. 매니페스트만 푸시해도 자동으로 돌도록 설정되어 있습니다.</p>
+  <p>참고: 캡처 엔진은 Docker로 동작하므로 캡처 자체는 GitHub Actions(또는 Docker가 있는 로컬 PC)에서 수행됩니다.</p>
+
+  <div class="sub">5.4 사이트 배포</div>
+  <p>매니페스트나 <code>site/</code>가 바뀌면 <strong>"Deploy archive site to Pages"</strong> 워크플로우가 <code>index.json</code>을 새로 만들고 WACZ를 모아 Pages에 배포합니다. 잘못 캡처된 옛 파일은 배포 때 폴더를 새로 만들며 자동 정리됩니다.</p>
+
+  <div class="sub">5.5 매 학기 루틴</div>
+  <ol>
+    <li>학생들에게 공개 URL을 수집한다 (사이트가 살아 있을 때, 학기 중·직후).</li>
+    <li>manifest.csv에 그 학기 학생들을 추가한다 (학기 태그 통일: 예 <code>2026-fall</code>).</li>
+    <li>"Archive student sites" 실행 → 캡처.</li>
+    <li>사이트에서 각 작품이 제대로 재생되는지 점검한다 (특히 인터랙티브 작품).</li>
+    <li>부실 캡처는 옵션을 조정해 다시 실행한다.</li>
+    <li>그 학기 WACZ 묶음을 외부 백업에도 복제한다.</li>
+  </ol>
+
+  <div class="sub">5.6 백업과 장기 보존</div>
+  <p>모든 WACZ는 최소 두세 벌, 서로 다른 위치에 둡니다(예: GitHub, 학교/개인 외장 저장소, 클라우드 객체저장소). 1년에 한 번 파일이 손상되지 않았는지(해시 일치) 점검합니다. 저장 총량이 수십 GB로 커지면 WACZ만 외부 저장소로 옮기고 사이트가 그 주소를 가리키게 하면 되며, 정적 방식이라 나머지는 그대로 둡니다.</p>
+
+  <div class="sub">5.7 인수인계</div>
+  <p>다음 담당자에게 (1) GitHub 계정 접근 방법, (2) manifest.csv에 줄 추가하는 법, (3) replayweb.page 고정 버전, (4) 백업 위치를 전달하면 됩니다. 시스템이 단순할수록 오래갑니다 — 이 시스템이 단순한 이유입니다.</p>
+
+  <div class="section-label">6. 현재 상태 요약 (2026-spring)</div>
+  <div class="note-box">
+    전체 학생 35명 · 정상 공개(재생 가능) 17명 · (재)캡처 대기 14명 (URL 확정·검증 완료) · URL 미정 4명
+  </div>
+  <p>남은 일은 두 가지뿐입니다.</p>
+  <ul>
+    <li>(재)캡처 대기 14명 — "Archive student sites"를 <code>mode=pending</code>으로 실행하면 자동 처리됩니다. 링크는 모두 생존 확인을 마쳤습니다.</li>
+    <li>URL 미정 4명 — SeoHyeon Kim, Seungyun Lee, David Tsoy, Jaemin Han. 학생에게 주소만 받으면 됩니다.</li>
+  </ul>
+
+  <div class="section-label">7. 자주 생기는 문제와 대응</div>
+  <div class="sub">URL 오타</div>
+  <p>가장 흔합니다. 화면에서 옮길 때 한두 글자가 틀립니다. 캡처 전, 브라우저로 실제 열어 200으로 뜨는지 확인하면 빈 페이지 박제를 막을 수 있습니다.</p>
+  <div class="sub">파일명에 공백·한글</div>
+  <p>일부 작품은 이미지 파일명에 공백이나 한글이 들어 있습니다(예: <code>스크린샷 2026-...png</code>). 캡처·재생 시 깨질 수 있으므로, 해당 작품은 캡처 후 이미지가 정상 표시되는지 꼭 눈으로 확인합니다.</p>
+  <div class="sub">인터랙티브 작품</div>
+  <p>클릭·스크롤·실시간 사운드 등 사용자 조작에 반응하는 작품은 자동 크롤링이 일부를 놓칠 수 있습니다. 이런 경우 ArchiveWeb.page 브라우저 확장으로 사람이 직접 조작하며 녹화하면 같은 WACZ로 시스템에 그대로 들어옵니다.</p>
+  <div class="sub">외부 임베드(구글 슬라이드 등)</div>
+  <p>로그인이나 외부 서비스에 의존하는 링크는 재생 충실도가 떨어질 수 있습니다. 가능하면 학생에게 자체 호스팅된 공개 URL을 받는 것이 좋습니다.</p>
+  <div class="sub">저장 용량</div>
+  <p>영상·고해상도 에셋이 많으면 WACZ가 커집니다. 단일 파일이 너무 커지면 외부 객체저장소로 분리합니다.</p>
+
+  <div class="section-label">8. 부록</div>
+  <div class="sub">8.1 폴더 구조</div>
+<pre>class-web-archive/
+├─ manifest.csv              단일 출처 (학생·작품·상태)
+├─ site/
+│  ├─ index.html             아카이브 목록 페이지
+│  ├─ viewer.html            개별 작품 재생 페이지
+│  ├─ app.js / styles.css    목록 렌더링 / 스타일
+│  ├─ index.json             빌드시 manifest로부터 생성
+│  ├─ replay/                replayweb.page (버전 고정, 자가호스팅)
+│  └─ wacz/&lt;학기&gt;/           재생용 WACZ (빌드시 모임)
+├─ tools/
+│  ├─ crawl_manifest.py      매니페스트 행 캡처
+│  ├─ build_index.py         manifest.csv → index.json
+│  └─ prepare_pages_wacz.py  WACZ를 site/wacz로 모음
+└─ .github/workflows/        archive.yml(캡처) / static.yml(배포)</pre>
+
+  <div class="sub">8.2 매니페스트 컬럼</div>
+  <table>
+    <tr><th>컬럼</th><th>설명</th></tr>
+    <tr><td>student_name</td><td>학생 이름</td></tr>
+    <tr><td>title</td><td>작품 제목</td></tr>
+    <tr><td>original_url</td><td>원본 사이트 주소 (공개·로그인 불필요)</td></tr>
+    <tr><td>semester</td><td>학기 태그 (예: 2026-spring)</td></tr>
+    <tr><td>wacz_file</td><td>캡처 결과 파일명 (자동 생성)</td></tr>
+    <tr><td>wacz_url</td><td>재생용 주소 (빌드시 계산, 보통 비워둠)</td></tr>
+    <tr><td>archived_date</td><td>캡처 날짜</td></tr>
+    <tr><td>sha256</td><td>무결성 점검용 해시</td></tr>
+    <tr><td>status</td><td>ok / pending / recapture-needed / private</td></tr>
+    <tr><td>notes</td><td>비고 (교정 이력·주의사항 등)</td></tr>
+  </table>
+
+  <div class="footer rule-thin"></div>
+  <p class="footer">이 시스템의 미덕은 단순함입니다. 표준 포맷(WACZ) + 서버 없는 재생 + 텍스트 매니페스트 + 무료 정적 호스팅 — 네 가지 모두 "10년 뒤에도 그대로 열린다"에 베팅한 선택입니다. 복잡한 것이 없으므로 고장 날 것도, 매년 손볼 것도 거의 없습니다.</p>
+
+</div>
+</body>
+</html>

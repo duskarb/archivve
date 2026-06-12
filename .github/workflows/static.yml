@@ -8,7 +8,6 @@ on:
     paths:
       - ".github/workflows/static.yml"
       - "README.md"
-      - "manifest.csv"
       - "site/**"
       - "tools/build_index.py"
       - "tools/prepare_pages_wacz.py"
