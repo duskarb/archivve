@@ -1,0 +1,71 @@
+name: Archive student sites
+
+on:
+  workflow_dispatch:
+    inputs:
+      semester:
+        description: "Optional semester to capture, for example 2026-spring"
+        required: false
+        type: string
+      mode:
+        description: "Capture pending rows or every selected row"
+        required: true
+        default: pending
+        type: choice
+        options:
+          - pending
+          - all
+  push:
+    paths:
+      - manifest.csv
+      - site/**
+      - tools/**
+      - .github/workflows/archive.yml
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+env:
+  BROWSERTRIX_IMAGE: webrecorder/browsertrix-crawler:1.13.0
+
+jobs:
+  archive:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Capture manifest rows
+        env:
+          SEMESTER: ${{ inputs.semester || '' }}
+          MODE: ${{ inputs.mode || 'pending' }}
+        run: |
+          python3 tools/crawl_manifest.py \
+            --semester "$SEMESTER" \
+            --mode "$MODE" \
+            --image "$BROWSERTRIX_IMAGE"
+
+      - name: Upload WACZ files to GitHub Releases
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 tools/upload_releases.py out/release-assets.tsv
+
+      - name: Build static archive index
+        run: python3 tools/build_index.py
+
+      - name: Commit generated archive metadata
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add manifest.csv site/index.json
+          if ! git diff --cached --quiet; then
+            git commit -m "Update archive metadata [skip ci]"
+            git push
+          fi
+
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+      - uses: actions/deploy-pages@v4
