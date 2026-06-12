@@ -7,6 +7,7 @@ import argparse
 import csv
 import os
 import shutil
+import subprocess
 import sys
 import urllib.request
 from pathlib import Path
@@ -19,12 +20,33 @@ def clean(value: str | None) -> str:
     return (value or "").strip()
 
 
-def release_url(row: dict[str, str]) -> str:
+def repository_name() -> str:
+    explicit = os.environ.get("GITHUB_REPOSITORY", "")
+    if explicit:
+        return explicit
+
+    result = subprocess.run(
+        ["git", "config", "--get", "remote.origin.url"],
+        cwd=ROOT,
+        check=False,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.DEVNULL,
+        text=True,
+    )
+    remote = result.stdout.strip()
+    if remote.startswith("https://github.com/"):
+        return remote.removeprefix("https://github.com/").removesuffix(".git")
+    if remote.startswith("git@github.com:"):
+        return remote.removeprefix("git@github.com:").removesuffix(".git")
+
+    return ""
+
+
+def release_url(row: dict[str, str], repository: str) -> str:
     explicit = clean(row.get("wacz_url"))
     if explicit:
         return explicit
 
-    repository = os.environ.get("GITHUB_REPOSITORY", "")
     semester = clean(row.get("semester"))
     wacz_file = clean(row.get("wacz_file"))
     if repository and semester and wacz_file:
@@ -51,6 +73,7 @@ def main() -> None:
     manifest = Path(args.manifest)
     out_dir = Path(args.out_dir)
     target_root = Path(args.site_dir) / "wacz"
+    repository = repository_name()
 
     if target_root.exists():
         shutil.rmtree(target_root)
@@ -81,7 +104,7 @@ def main() -> None:
                 shutil.copy2(local, target)
                 continue
 
-            url = release_url(row)
+            url = release_url(row, repository)
             if not url:
                 missing.append(f"{semester}/{wacz_file}: no release URL")
                 continue
