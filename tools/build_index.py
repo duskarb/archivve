@@ -19,10 +19,6 @@ def clean(value: str | None) -> str:
 
 
 def computed_wacz_url(row: dict[str, str]) -> str:
-    explicit = clean(row.get("wacz_url"))
-    if explicit:
-        return explicit
-
     wacz_file = clean(row.get("wacz_file"))
     semester = clean(row.get("semester"))
     public_wacz_base = os.environ.get("ARCHIVE_PUBLIC_WACZ_BASE", "")
@@ -31,6 +27,10 @@ def computed_wacz_url(row: dict[str, str]) -> str:
 
     if public_wacz_base and semester and wacz_file:
         return f"{public_wacz_base.rstrip('/')}/{semester}/{wacz_file}"
+
+    explicit = clean(row.get("wacz_url"))
+    if explicit:
+        return explicit
 
     if not release_base and repository:
         release_base = f"https://github.com/{repository}/releases/download"
