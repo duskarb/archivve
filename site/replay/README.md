@@ -1,10 +1,18 @@
 # Replay Runtime
 
-Place the pinned ReplayWeb.page runtime files here:
+Pinned ReplayWeb.page runtime files:
 
 - `ui.js`
 - `sw.js`
 
-Keep a note of the downloaded ReplayWeb.page version in this file when the
-files are added. The public archive should load these local files instead of a
-CDN.
+Version: `replaywebpage@2.4.6`
+License: `AGPL-3.0-or-later` (`LICENSE.replaywebpage.txt`)
+
+Source:
+
+- `https://cdn.jsdelivr.net/npm/replaywebpage@2.4.6/ui.js`
+- `https://cdn.jsdelivr.net/npm/replaywebpage@2.4.6/sw.js`
+- `https://cdn.jsdelivr.net/npm/replaywebpage@2.4.6/LICENSE`
+
+The public archive loads these local files instead of a CDN so the viewer stays
+stable even if ReplayWeb.page changes later.

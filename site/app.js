@@ -20,7 +20,7 @@ function clean(value) {
 // 상태값 규칙(운영 가이드 4.6): ok 공개, partial 공개+주석, review-needed 조건부
 // 공개(재생 비활성), recapture-needed/private 숨김.
 const HIDDEN_STATUSES = new Set(["recapture-needed", "private"]);
-const PLAYABLE_STATUSES = new Set(["ok", "partial"]);
+const PLAYABLE_STATUSES = new Set(["ok", "partial", "archived"]);
 
 function status(row) {
   return clean(row.status).toLowerCase() || "pending";
@@ -94,10 +94,12 @@ function renderRows() {
   empty.hidden = rows.length > 0;
 
   rows.forEach((row, index) => {
-    const playable = Boolean(clean(row.wacz_url)) && PLAYABLE_STATUSES.has(status(row));
-    const item = document.createElement(playable ? "a" : "div");
-    item.className = playable ? "archive-row" : "archive-row is-disabled";
-    if (playable) item.href = viewerUrl(row);
+    const hasArchive = Boolean(clean(row.wacz_url));
+    const playable = hasArchive && PLAYABLE_STATUSES.has(status(row));
+    const reviewable = hasArchive && status(row) === "review-needed";
+    const item = document.createElement("div");
+    item.className = "archive-row";
+    if (!hasArchive && !clean(row.original_url)) item.classList.add("is-disabled");
     if (clean(row.notes)) item.title = clean(row.notes);
 
     const number = document.createElement("span");
@@ -118,7 +120,30 @@ function renderRows() {
     statusCell.className = `status status-${status(row)}`;
     statusCell.textContent = status(row);
 
-    item.append(number, work, student, term, statusCell);
+    const links = document.createElement("span");
+    links.className = "row-links";
+
+    if (clean(row.original_url)) {
+      const original = document.createElement("a");
+      original.href = clean(row.original_url);
+      original.target = "_blank";
+      original.rel = "noopener";
+      original.textContent = "Original";
+      links.appendChild(original);
+    }
+
+    if (playable || reviewable) {
+      const archive = document.createElement("a");
+      archive.href = viewerUrl(row);
+      archive.textContent = playable ? "Archive" : "Review";
+      links.appendChild(archive);
+    } else if (!hasArchive) {
+      const missing = document.createElement("span");
+      missing.textContent = "No WACZ";
+      links.appendChild(missing);
+    }
+
+    item.append(number, work, student, term, statusCell, links);
     list.appendChild(item);
   });
 }

@@ -13,6 +13,7 @@
       <strong id="viewer-title">Archived Work</strong>
       <span id="viewer-meta"></span>
     </div>
+    <a id="viewer-original" href="#" target="_blank" rel="noopener">Original</a>
   </header>
   <main class="viewer-frame" id="viewer-frame"></main>
 
@@ -26,6 +27,12 @@
     document.title = title;
     document.getElementById("viewer-title").textContent = title;
     document.getElementById("viewer-meta").textContent = student;
+    const originalLink = document.getElementById("viewer-original");
+    if (url) {
+      originalLink.href = url;
+    } else {
+      originalLink.hidden = true;
+    }
 
     function showMessage(message) {
       const frame = document.getElementById("viewer-frame");
@@ -37,7 +44,7 @@
     }
 
     if (!source || !url) {
-      showMessage("Archive source is missing.");
+      showMessage("Archive source is missing. Capture this row first, then return here.");
     } else {
       const replayScript = document.createElement("script");
       replayScript.src = "replay/ui.js";
