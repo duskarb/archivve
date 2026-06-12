@@ -20,7 +20,7 @@ KAIST Industrial Design / Spring 2026
 - `site/replay/` — replayweb.page 런타임(`ui.js`, `sw.js`)을 버전 고정해 자가호스팅.
 - `tools/` — 서드파티 의존성 없는 파이썬 스크립트.
 - `.github/workflows/archive.yml` — 매니페스트 변경 시 자동 크롤링 → WACZ 생성 →
-  체크섬 기록 → Releases 업로드 → Pages 배포.
+  체크섬 기록 → Releases 업로드 → Pages 재생용 사본 배포.
 
 ## 운영 워크플로우 (CSV → 자동 아카이브)
 
@@ -65,7 +65,7 @@ KAIST Industrial Design / Spring 2026
 | status | 의미 | 공개 여부 |
 |---|---|---|
 | `ok` | 재생 확인 완료 | 공개 (재생 가능) |
-| `review-needed` | 자동 캡처는 됐지만 사람이 확인해야 함 | 목록에 표시, 재생 비활성 |
+| `review-needed` | 자동 캡처는 됐지만 사람이 확인해야 함 | 목록에 표시, Review 재생 가능 |
 | `partial` | 일부 리소스/인터랙션 누락 | 공개, `notes`에 주석 필수 |
 | `recapture-needed` | 다시 캡처해야 함 (다음 실행 시 자동 재캡처) | 숨김 |
 | `private` | 학생 요청/저작권/개인정보 문제 | 비공개 (캡처·색인 모두 제외) |
@@ -91,7 +91,10 @@ KAIST Industrial Design / Spring 2026
 
 - 각 WACZ의 SHA-256 체크섬이 매니페스트에 기록된다. 1년에 한 번 같은
   해시인지 확인(fixity 점검)하고, 다르면 백업본과 비교한다.
-- GitHub Releases는 공개 배포용 사본이지 유일한 원본이 아니다. 저장 위치를
-  옮기면 매니페스트의 `wacz_url`만 바꾸면 된다.
+- GitHub Releases는 장기 보관/다운로드용 사본이고, GitHub Pages에는 재생을 위한
+  같은 출처(`site/wacz/`) 사본이 배포된다. 브라우저 재생기는 CORS 제한 때문에
+  Release 다운로드 URL을 직접 읽지 못할 수 있다.
+- 저장 위치를 옮기면 매니페스트의 `wacz_url` 또는 빌드 환경의
+  `ARCHIVE_PUBLIC_WACZ_BASE`를 바꾸면 된다.
 - 자동 크롤링이 약한 인터랙티브 작품은 ArchiveWeb.page로 수동 캡처해 같은
   WACZ로 이 파이프라인에 넣을 수 있다.

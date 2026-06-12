@@ -68,7 +68,12 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: python3 tools/upload_releases.py out/release-assets.tsv
 
+      - name: Prepare WACZ files for Pages playback
+        run: python3 tools/prepare_pages_wacz.py
+
       - name: Build static archive index
+        env:
+          ARCHIVE_PUBLIC_WACZ_BASE: wacz
         run: python3 tools/build_index.py
 
       - name: Commit generated archive metadata

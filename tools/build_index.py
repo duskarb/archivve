@@ -25,8 +25,12 @@ def computed_wacz_url(row: dict[str, str]) -> str:
 
     wacz_file = clean(row.get("wacz_file"))
     semester = clean(row.get("semester"))
+    public_wacz_base = os.environ.get("ARCHIVE_PUBLIC_WACZ_BASE", "")
     repository = os.environ.get("GITHUB_REPOSITORY", "")
     release_base = os.environ.get("ARCHIVE_RELEASE_BASE", "")
+
+    if public_wacz_base and semester and wacz_file:
+        return f"{public_wacz_base.rstrip('/')}/{semester}/{wacz_file}"
 
     if not release_base and repository:
         release_base = f"https://github.com/{repository}/releases/download"

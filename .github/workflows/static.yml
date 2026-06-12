@@ -1,10 +1,17 @@
 # Simple workflow for deploying static content to GitHub Pages
-name: Deploy static content to Pages
+name: Deploy archive site to Pages
 
 on:
   # Runs on pushes targeting the default branch
   push:
     branches: ["main"]
+    paths:
+      - ".github/workflows/static.yml"
+      - "README.md"
+      - "manifest.csv"
+      - "site/**"
+      - "tools/build_index.py"
+      - "tools/prepare_pages_wacz.py"
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -31,13 +38,20 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      - name: Prepare WACZ files for Pages playback
+        run: python3 tools/prepare_pages_wacz.py
+
+      - name: Build static archive index
+        env:
+          ARCHIVE_PUBLIC_WACZ_BASE: wacz
+        run: python3 tools/build_index.py
+
       - name: Setup Pages
         uses: actions/configure-pages@v5
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          # Upload entire repository
-          path: '.'
+          path: 'site'
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v5
