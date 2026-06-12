@@ -22,19 +22,29 @@ KAIST Industrial Design / Spring 2026
 - `.github/workflows/archive.yml` — 매니페스트 변경 시 자동 크롤링 → WACZ 생성 →
   체크섬 기록 → Releases 업로드 → Pages 배포.
 
-## 운영 워크플로우 (링크 → 자동 아카이브)
+## 운영 워크플로우 (CSV → 자동 아카이브)
 
 1. 학생에게서 로그인 없이 접근 가능한 **공개 URL**을 받는다.
 2. `manifest.csv`에 한 줄 추가한다: 이름, 제목, URL, 학기(예: `2026-spring`).
-3. 커밋·푸시하면 Actions가 자동으로 크롤링하고 사이트를 재배포한다.
-4. 캡처된 작품을 ReplayWeb.page에서 직접 열어 재생 품질을 확인한 뒤
+3. `status`를 비워 두거나 `pending`으로 둔다.
+4. 커밋·푸시하면 Actions가 `manifest.csv`를 읽고 pending 행만 자동으로 크롤링한다.
+5. 캡처가 끝난 행은 자동으로 `review-needed`가 되고, `wacz_file`,
+   `archived_date`, `sha256`이 채워진다.
+6. 캡처된 작품을 ReplayWeb.page에서 직접 열어 재생 품질을 확인한 뒤
    `status`를 갱신한다. **캡처 성공과 재생 성공은 다르다** — 자동 캡처 직후
    상태는 `review-needed`이며, 사람이 확인해야 `ok`가 된다.
-5. 그 학기 WACZ 묶음을 장기 저장소와 외부 백업에 복제한다(아래 백업 위치).
+7. 그 학기 WACZ 묶음을 장기 저장소와 외부 백업에 복제한다(아래 백업 위치).
+
+일상 운영에서는 GitHub Actions 화면을 직접 열 필요가 없다. `manifest.csv`가
+크롤링 큐 역할을 한다.
 
 ## 첫 크롤링 테스트
 
-처음에는 전체 학생을 한 번에 돌리지 말고 한 명만 테스트한다.
+처음에는 전체 학생을 한 번에 돌리지 말고, `manifest.csv`에서 테스트할 학생
+1명만 `pending`으로 두고 나머지는 `review-needed` 또는 `private`처럼 캡처 대상이
+아닌 상태로 둔다. 그 상태로 커밋·푸시하면 CSV에서 바로 한 명만 크롤링된다.
+
+수동으로 테스트하고 싶다면 Actions 화면에서도 한 명만 실행할 수 있다.
 
 1. GitHub 레포의 **Actions** 탭으로 간다.
 2. **Archive student sites** workflow를 선택한다.

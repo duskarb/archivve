@@ -1,6 +1,9 @@
 name: Archive student sites
 
 on:
+  push:
+    paths:
+      - manifest.csv
   workflow_dispatch:
     inputs:
       semester:
@@ -46,11 +49,11 @@ jobs:
 
       - name: Capture manifest rows
         env:
-          SEMESTER: ${{ inputs.semester || '' }}
-          MODE: ${{ inputs.mode || 'pending' }}
-          MATCH: ${{ inputs.match || '' }}
-          PAGE_LIMIT: ${{ inputs.page_limit || '30' }}
-          DEPTH: ${{ inputs.depth || '3' }}
+          SEMESTER: ${{ github.event.inputs.semester || '' }}
+          MODE: ${{ github.event.inputs.mode || 'pending' }}
+          MATCH: ${{ github.event.inputs.match || '' }}
+          PAGE_LIMIT: ${{ github.event.inputs.page_limit || '30' }}
+          DEPTH: ${{ github.event.inputs.depth || '3' }}
         run: |
           python3 tools/crawl_manifest.py \
             --semester "$SEMESTER" \
