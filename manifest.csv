@@ -1,10 +1,10 @@
 student_name,title,original_url,semester,wacz_file,wacz_url,archived_date,sha256,status,notes
-Seohyeon Gu,Chess,https://gsh0407.github.io/Chess-/,2026-spring,,,,,pending,"URL ok, but WACZ file was missing — needs capture."
+Seohyeon Gu,Chess,https://gsh0407.github.io/Chess-/,2026-spring,seohyeon-gu-2026-spring.wacz,,2026-06-12,db93b0d14a66e513223ebff610830c37007a7eca69633f97dc935bd913503765,ok,"URL ok, but WACZ file was missing — needs capture."
 Jaejun Youn,Protocol,https://yjj8895-git.github.io/protocol/,2026-spring,jaejun-youn-2026-spring.wacz,,2026-06-12,e70cd32a58838a58610475dc183632541534062c3bde6a0082b19e01da82def7,ok,
-Yul Jeong,Decision & Action - Protocol,https://wjddbf0601.github.io/protocol-project/lastday.html,2026-spring,,,,,pending,URL verified live (title matches) — ready to capture.
+Yul Jeong,Decision & Action - Protocol,https://wjddbf0601.github.io/protocol-project/lastday.html,2026-spring,yul-jeong-2026-spring.wacz,,2026-06-12,aeb05eb3502d2ce2413f78d3f05c9115764a9eadb338e21de8dfc76d3d05e836,ok,URL verified live (title matches) — ready to capture.
 Shakhzoda,Stepping Stone Path,https://shakhzoda006.github.io/stepping-stone-path/,2026-spring,shakhzoda-2026-spring.wacz,,2026-06-12,51cc9d146d8d6d5efce76c50d270aa04f0a73288e17411734e4a17881d8b07a5,ok,
 Saimmyo Das Arnob,ID Protocol,https://arnob-lab.github.io/ID-protocol/,2026-spring,saimmyo-das-arnob-2026-spring.wacz,,2026-06-12,1f867652de1c23eeb9ddab632f69f1e7c6bbfb96f817c007d4120d6277b98d10,ok,
-Hogeun Yun,The Red Carpet,https://hogeun26.github.io/protocol_proj/,2026-spring,,,,,pending,URL corrected (was hogeun2f) — re-capture; previous WACZ was wrong site.
+Hogeun Yun,The Red Carpet,https://hogeun26.github.io/protocol_proj/,2026-spring,hogeun-yun-2026-spring.wacz,,2026-06-12,b32cd473dbd60a995458a62d22eb87a3b7893dd6e0916a267f5f057a2381b9f2,ok,URL corrected (was hogeun2f) — re-capture; previous WACZ was wrong site.
 Jiwon Eom,Presentation,https://docs.google.com/presentation/d/1oS3KNWZz-vIVtFtwEELJookUzb256GhLpJBWtQ6WOEo/edit?usp=drivesdk,2026-spring,jiwon-eom-2026-spring.wacz,,2026-06-12,4c1baf6aec1a1d60557a1f0b83ce2df7659643955fef866ff6c6ee0e06bd6421,ok,Google Slides link — replay fidelity may be limited.
 Yeeun Park,Elevator,https://rmpark7.github.io/elevator/,2026-spring,yeeun-park-2026-spring.wacz,,2026-06-12,5fdbbe0390cac9706c47ff105860c5acbb270a9bc4fa566704984b5273d87852,ok,
 SeoHyeon Kim,,,2026-spring,,,,,pending,No URL provided yet — awaiting student link.
@@ -12,25 +12,25 @@ Seungyun Lee,,,2026-spring,,,,,pending,No URL provided yet — awaiting student 
 David Tsoy,,,2026-spring,,,,,pending,No URL provided yet — awaiting student link.
 Chaemin Hyung,Our Old New Shelter,https://surifromspring.github.io/OurOldNewShelter/,2026-spring,chaemin-hyung-2026-spring.wacz,,2026-06-12,bc4e494dc6193b91fc4453a18092bbfacfd2725e2717b42f02e687c1903355c0,ok,
 Junehwi Kim,Wakapada,https://junehwi07.github.io/wakapada/,2026-spring,junehwi-kim-2026-spring.wacz,,2026-06-12,7ae8bd9337293c330c66a52a5a74d7b0e295ad6ff00496e43aad841f045b81b5,ok,
-Seungmin Yang,Protocol Project,https://ysm6813.github.io/DS1-B-20210364-/protocol.html,2026-spring,,,,,pending,URL corrected (missing slash before protocol.html) — re-capture.
-HyeonGyu Jeon,Spatial Protocols,https://gusrb.github.io/,2026-spring,,,,,pending,URL added & verified live — ready to capture.
+Seungmin Yang,Protocol Project,https://ysm6813.github.io/DS1-B-20210364-/protocol.html,2026-spring,seungmin-yang-2026-spring.wacz,,2026-06-12,b83605b3b2bfe59fd93d8755e8cad0485de4f5753e63ebbf777151323f1db511,ok,URL corrected (missing slash before protocol.html) — re-capture.
+HyeonGyu Jeon,Spatial Protocols,https://gusrb.github.io/,2026-spring,hyeongyu-jeon-2026-spring.wacz,,2026-06-12,81038c5a76d90abe0d5f045986014a79d6ba33c190481e920d58aa5c823d14d2,ok,URL added & verified live — ready to capture.
 Bumgyu Suh,Bicycle Park,https://pobadoba.github.io/bicycle-park/,2026-spring,bumgyu-suh-2026-spring.wacz,,2026-06-12,e7d07438723441da49ae0acab28a26f88a81e4ed5d6c38a104ea33bc5c39d56c,ok,
 Myeonghyeon Choi,20250746 ID220012,https://choimh0519-ai.github.io/20250746ID220012/,2026-spring,myeonghyun-choi-2026-spring.wacz,,2026-06-12,fd896d8c7dbe41eeaf1f4ca99356e23604abbfb6212892e482444354cb550c50,ok,
-Sohyeon Park,SUN Clock Project,https://thgus0407.github.io/sunclock_project/,2026-spring,,,,,pending,URL verified live (title matches) — ready to capture.
+Sohyeon Park,SUN Clock Project,https://thgus0407.github.io/sunclock_project/,2026-spring,sohyeon-park-2026-spring.wacz,,2026-06-12,1f324cbb87ae84bfecd37bd948681e4afc724639781ede95d69a049b2e69aed8,ok,URL verified live (title matches) — ready to capture.
 Jaemin Han,,,2026-spring,,,,,pending,No URL provided yet — awaiting student link.
 Seokyoung Yoon,Hop the Shortcut,https://sk-y00n.github.io/hop-the-shortcut/,2026-spring,seokyoung-yoon-2026-spring.wacz,,2026-06-12,a61a6a58e4bab2dfb7732272c7978230f13c6db882faf837d1c152660c80fd69,ok,
 Balsam Al-Hadithi,Ichi-go Ichi-e,https://lolobalsam1.github.io/ichi-go-ichi-e/index.html,2026-spring,balsam-al-hadithi-2026-spring.wacz,,2026-06-12,e79ecc81d68ed61dd8b692b57a20a9912567eb294d3c46e3776d60ae81aa642e,ok,
 Naeun Kim,Skysandwich,https://wooeekim.github.io/skysandwich/,2026-spring,naeun-kim-2026-spring.wacz,,2026-06-12,5ede0f78fa98c50c53b80cbcad7e87564b14f1b5fbd42fec163c279a7f8b0e9d,ok,
-Somin Lee,"Public Surface, Private Object",https://leesomin0605-oss.github.io/protocol-project/,2026-spring,,,,,pending,URL corrected (was eesomin0605) — re-capture.
+Somin Lee,"Public Surface, Private Object",https://leesomin0605-oss.github.io/protocol-project/,2026-spring,somin-lee-2026-spring.wacz,,2026-06-12,c61fe692d2b0bcf048adb2d922e1608bc5810c4b2deccc6fe0a58ccddff1c741,ok,URL corrected (was eesomin0605) — re-capture.
 Changwon Choi,DS1 Protocol,https://changwonchoi.github.io/DS1_Protocol/,2026-spring,changwon-choi-2026-spring.wacz,,2026-06-12,1f69ca3c12251edafa86867c52088099581690bc3ee1660e19bd7066dd8f4526,ok,
-Suji Lim,Phone Refugees,https://s000jing.github.io/Phone-refugees/,2026-spring,,,,,pending,URL corrected (was s000j6) — re-capture.
-Seohyun Ahn,Don't Press It!,https://clink14.github.io/Don-t-Press-It,2026-spring,,,,,pending,URL corrected & verified live — ready to capture.
+Suji Lim,Phone Refugees,https://s000jing.github.io/Phone-refugees/,2026-spring,suji-lim-2026-spring.wacz,,2026-06-12,01219dd8947db38060934507cedde62ad7b17f1cb167de02ee46c5f8b46731a6,ok,URL corrected (was s000j6) — re-capture.
+Seohyun Ahn,Don't Press It!,https://clink14.github.io/Don-t-Press-It,2026-spring,seohyun-ahn-2026-spring.wacz,,2026-06-12,9b3c20f87fbe4098f5f64ee0bb0b9a1af6c5f01137824b99b77956562f465fe9,ok,URL corrected & verified live — ready to capture.
 Gyuri Kim,DS1 Proj3 Protocol,https://laurastellae.github.io/DS1_Proj3_Protocol/,2026-spring,gyuri-kim-2026-spring.wacz,,2026-06-12,31cd4ac537a5218b69e1f53372426d194c2233b9e45b6a5b4f735ca8ccb3da26,ok,
 Hyunjoon Jeong,Invisible Until Noticed,https://0826fry.github.io/invisible_until_noticed.github.io/,2026-spring,hyunjeon-jeong-2026-spring.wacz,,2026-06-12,2fee22ce1757a8c232e7d26b622a72e67265e540fda5c07d3d54541715bd309e,ok,Note: QR code modified — scan when back in N25.
 Chaeyoung Huh,Fortune,https://chaeyounghuh.github.io/fortune/,2026-spring,chaeyoung-huh-2026-spring.wacz,,2026-06-12,124fa26ec69128ee7384ee7d92f2d618119454ab9649a54c052e3ee9cc2d0d46,ok,Interactive site — best viewed on PC.
-Seoyun Oh,Design Studio,https://oseoyoon3148-create.github.io/DesignStudio1/,2026-spring,,,,,pending,URL corrected (was seoyoon3148-creat2) — ready to capture.
-Yeonyoung Kim,Passageway,https://brgnmorum.github.io/passageway/,2026-spring,,,,,pending,URL corrected (was brgnmoru) — re-capture.
+Seoyun Oh,Design Studio,https://oseoyoon3148-create.github.io/DesignStudio1/,2026-spring,seoyun-oh-2026-spring.wacz,,2026-06-12,5d4ca78e43abc051089bb78fbb57e8229636ab7b1cd1bcb2be142d508c2dc8fc,ok,URL corrected (was seoyoon3148-creat2) — ready to capture.
+Yeonyoung Kim,Passageway,https://brgnmorum.github.io/passageway/,2026-spring,yeonyoung-kim-2026-spring.wacz,,2026-06-12,4c09548c398d40a4c3a154b1740821a63bd0999e2ac2b23f0e8132b10b183983,ok,URL corrected (was brgnmoru) — re-capture.
 Sungmin Park,Protocol Change Project,https://lightsky30.github.io/protocol_change_project/,2026-spring,sungmin-park-2026-spring.wacz,,2026-06-12,affbead8dbe5462e59f1ba8e90282dfe59d9bc3bfec84ac7e2cb3e69c0341953,ok,
-Kincso Kinga Szilagyi,Whimsical Bridge Project,https://kinga1912kinga.github.io/Whimsical-Spot-of-KAIST/,2026-spring,,,,,pending,URL added & verified live — ready to capture.
-Myeongje Lee,Audio Guide,https://leemyeongje.github.io/id20012-protocol/,2026-spring,,,,,pending,URL corrected (was eemyeongje/fd2012) — re-capture. Also has /about.html.
-Amanbay Makhabbat,Light at the Threshold,https://yoondzhy.github.io/Protocol-project/,2026-spring,,,,,pending,URL corrected (was yoandzhy) — re-capture; previous WACZ was near-empty.
+Kincso Kinga Szilagyi,Whimsical Bridge Project,https://kinga1912kinga.github.io/Whimsical-Spot-of-KAIST/,2026-spring,kincso-kinga-szilagyi-2026-spring.wacz,,2026-06-12,d96bd3b915cfd2483c6ea808f0526226f104bf53c64fd7638fe8328a9b9309c5,ok,URL added & verified live — ready to capture.
+Myeongje Lee,Audio Guide,https://leemyeongje.github.io/id20012-protocol/,2026-spring,myeongje-lee-2026-spring.wacz,,2026-06-12,8731e32cb80faf70fd21b3914c854863e314b5d660f14a7d560d0a9e59564cfe,ok,URL corrected (was eemyeongje/fd2012) — re-capture. Also has /about.html.
+Amanbay Makhabbat,Light at the Threshold,https://yoondzhy.github.io/Protocol-project/,2026-spring,amanbay-makhabbat-2026-spring.wacz,,2026-06-12,c8f80580c95a58e6328c5779e07edd3cea66d315c41e3af5aa627c65e9edbd4f,ok,URL corrected (was yoandzhy) — re-capture; previous WACZ was near-empty.
