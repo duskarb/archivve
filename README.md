@@ -32,6 +32,24 @@ KAIST Industrial Design / Spring 2026
    상태는 `review-needed`이며, 사람이 확인해야 `ok`가 된다.
 5. 그 학기 WACZ 묶음을 장기 저장소와 외부 백업에 복제한다(아래 백업 위치).
 
+## 첫 크롤링 테스트
+
+처음에는 전체 학생을 한 번에 돌리지 말고 한 명만 테스트한다.
+
+1. GitHub 레포의 **Actions** 탭으로 간다.
+2. **Archive student sites** workflow를 선택한다.
+3. **Run workflow**를 누르고 아래처럼 입력한다.
+   - `semester`: `2026-spring`
+   - `mode`: `pending`
+   - `match`: `Seohyeon Gu` 처럼 학생 이름 또는 작품 제목
+   - `page_limit`: `30`
+   - `depth`: `3`
+4. 실행이 끝나면 GitHub Releases에 `.wacz` 파일이 올라가고,
+   `manifest.csv`의 `wacz_file`, `archived_date`, `sha256`, `status`가 갱신된다.
+5. 재생을 확인한 뒤 문제가 없으면 `status`를 `ok`로 바꾼다.
+
+여러 명이 안정적으로 성공한 뒤 `match`를 비워 전체 pending 항목을 크롤링한다.
+
 ## 검수 상태값 (`status`)
 
 | status | 의미 | 공개 여부 |

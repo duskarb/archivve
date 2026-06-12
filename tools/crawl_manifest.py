@@ -71,13 +71,27 @@ def write_manifest(path: Path, fields: list[str], rows: list[dict[str, str]]) ->
             writer.writerow({field: row.get(field, "") for field in fields})
 
 
-def should_capture(row: dict[str, str], semester: str, mode: str) -> bool:
+def row_matches(row: dict[str, str], match: str) -> bool:
+    if not match:
+        return True
+
+    needle = match.lower()
+    haystack = " ".join(
+        clean(row.get(field))
+        for field in ("student_name", "title", "original_url", "semester", "notes")
+    ).lower()
+    return needle in haystack
+
+
+def should_capture(row: dict[str, str], semester: str, mode: str, match: str) -> bool:
     status = clean(row.get("status")).lower()
     if not clean(row.get("original_url")):
         return False
     if status == "private":
         return False
     if semester and clean(row.get("semester")) != semester:
+        return False
+    if not row_matches(row, match):
         return False
     if mode == "all":
         return True
@@ -156,13 +170,14 @@ def main() -> None:
     parser.add_argument("--depth", type=int, default=5)
     parser.add_argument("--page-limit", type=int, default=100)
     parser.add_argument("--behaviors", default="autoscroll")
+    parser.add_argument("--match", default="")
     args = parser.parse_args()
 
     manifest = Path(args.manifest)
     out_dir = Path(args.out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
     fields, rows = read_manifest(manifest)
-    selected = [row for row in rows if should_capture(row, args.semester, args.mode)]
+    selected = [row for row in rows if should_capture(row, args.semester, args.mode, args.match)]
     asset_list = out_dir / "release-assets.tsv"
     failed: list[str] = []
 

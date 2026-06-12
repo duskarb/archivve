@@ -15,6 +15,20 @@ on:
         options:
           - pending
           - all
+      match:
+        description: "Optional text filter, for example a student name or project title"
+        required: false
+        type: string
+      page_limit:
+        description: "Maximum pages per site"
+        required: true
+        default: "30"
+        type: string
+      depth:
+        description: "Maximum crawl depth"
+        required: true
+        default: "3"
+        type: string
 
 permissions:
   contents: write
@@ -34,10 +48,16 @@ jobs:
         env:
           SEMESTER: ${{ inputs.semester || '' }}
           MODE: ${{ inputs.mode || 'pending' }}
+          MATCH: ${{ inputs.match || '' }}
+          PAGE_LIMIT: ${{ inputs.page_limit || '30' }}
+          DEPTH: ${{ inputs.depth || '3' }}
         run: |
           python3 tools/crawl_manifest.py \
             --semester "$SEMESTER" \
             --mode "$MODE" \
+            --match "$MATCH" \
+            --page-limit "$PAGE_LIMIT" \
+            --depth "$DEPTH" \
             --image "$BROWSERTRIX_IMAGE"
 
       - name: Upload WACZ files to GitHub Releases
