@@ -4,12 +4,12 @@
     "title": "Chess",
     "original_url": "https://gsh0407.github.io/Chess-/",
     "semester": "2026-spring",
-    "wacz_file": "seohyeon-gu-2026-spring.wacz",
-    "wacz_url": "wacz/2026-spring/seohyeon-gu-2026-spring.wacz",
-    "archived_date": "2026-06-12",
-    "sha256": "6e5b4f28cc646601850ec83b39a085cbfdbd7b7d2763e7e4e1a6edbb280ac33d",
-    "status": "ok",
-    "notes": ""
+    "wacz_file": "",
+    "wacz_url": "",
+    "archived_date": "",
+    "sha256": "",
+    "status": "pending",
+    "notes": "URL ok, but WACZ file was missing — needs capture."
   },
   {
     "student_name": "Jaejun Youn",
@@ -28,12 +28,12 @@
     "title": "Decision & Action - Protocol",
     "original_url": "https://wjddbf0601.github.io/protocol-project/lastday.html",
     "semester": "2026-spring",
-    "wacz_file": "yul-jeong-2026-spring.wacz",
-    "wacz_url": "wacz/2026-spring/yul-jeong-2026-spring.wacz",
-    "archived_date": "2026-06-12",
-    "sha256": "0f3c585d46e50f3bacf9ce419d4ecc5708e956d2d0cb21ee6cc5eccdd0a5a028",
-    "status": "ok",
-    "notes": "Numbers sheet lists title text but no visible URL."
+    "wacz_file": "",
+    "wacz_url": "",
+    "archived_date": "",
+    "sha256": "",
+    "status": "pending",
+    "notes": "URL verified live (title matches) — ready to capture."
   },
   {
     "student_name": "Shakhzoda",
@@ -61,15 +61,15 @@
   },
   {
     "student_name": "Hogeun Yun",
-    "title": "Protocol Proj",
-    "original_url": "https://hogeun2f.github.io/protocol_proj/",
+    "title": "The Red Carpet",
+    "original_url": "https://hogeun26.github.io/protocol_proj/",
     "semester": "2026-spring",
-    "wacz_file": "hogeun-yun-2026-spring.wacz",
-    "wacz_url": "wacz/2026-spring/hogeun-yun-2026-spring.wacz",
-    "archived_date": "2026-06-12",
-    "sha256": "1105437ea98ccb175b80ebe19f3cb5638e683eb1a3ba64fb87cb39bcb65ac8a2",
-    "status": "ok",
-    "notes": ""
+    "wacz_file": "",
+    "wacz_url": "",
+    "archived_date": "",
+    "sha256": "",
+    "status": "pending",
+    "notes": "URL corrected (was hogeun2f) — re-capture; previous WACZ was wrong site."
   },
   {
     "student_name": "Jiwon Eom",
@@ -81,7 +81,7 @@
     "archived_date": "2026-06-12",
     "sha256": "4c1baf6aec1a1d60557a1f0b83ce2df7659643955fef866ff6c6ee0e06bd6421",
     "status": "ok",
-    "notes": "Google Slides link from Numbers sheet."
+    "notes": "Google Slides link — replay fidelity may be limited."
   },
   {
     "student_name": "Yeeun Park",
@@ -105,7 +105,7 @@
     "archived_date": "",
     "sha256": "",
     "status": "pending",
-    "notes": "No URL visible in Numbers preview."
+    "notes": "No URL provided yet — awaiting student link."
   },
   {
     "student_name": "Seungyun Lee",
@@ -117,7 +117,7 @@
     "archived_date": "",
     "sha256": "",
     "status": "pending",
-    "notes": "No URL visible in Numbers preview."
+    "notes": "No URL provided yet — awaiting student link."
   },
   {
     "student_name": "David Tsoy",
@@ -129,7 +129,7 @@
     "archived_date": "",
     "sha256": "",
     "status": "pending",
-    "notes": "No URL visible in Numbers preview."
+    "notes": "No URL provided yet — awaiting student link."
   },
   {
     "student_name": "Chaemin Hyung",
@@ -157,27 +157,27 @@
   },
   {
     "student_name": "Seungmin Yang",
-    "title": "DS1-B-20210364 Protocol",
-    "original_url": "https://ysm6813.github.io/DS1-B-20210364-protocol.html",
-    "semester": "2026-spring",
-    "wacz_file": "seungmin-yang-2026-spring.wacz",
-    "wacz_url": "wacz/2026-spring/seungmin-yang-2026-spring.wacz",
-    "archived_date": "2026-06-12",
-    "sha256": "7eada88a443bc10a3e5c812f9744385dfdc5704ed9409a8f3503faa199ee1cb5",
-    "status": "ok",
-    "notes": ""
-  },
-  {
-    "student_name": "HyeonGyu Jeon",
-    "title": "",
-    "original_url": "",
+    "title": "Protocol Project",
+    "original_url": "https://ysm6813.github.io/DS1-B-20210364-/protocol.html",
     "semester": "2026-spring",
     "wacz_file": "",
     "wacz_url": "",
     "archived_date": "",
     "sha256": "",
     "status": "pending",
-    "notes": "No URL visible in Numbers preview."
+    "notes": "URL corrected (missing slash before protocol.html) — re-capture."
+  },
+  {
+    "student_name": "HyeonGyu Jeon",
+    "title": "Spatial Protocols",
+    "original_url": "https://gusrb.github.io/",
+    "semester": "2026-spring",
+    "wacz_file": "",
+    "wacz_url": "",
+    "archived_date": "",
+    "sha256": "",
+    "status": "pending",
+    "notes": "URL added & verified live — ready to capture."
   },
   {
     "student_name": "Bumgyu Suh",
@@ -192,7 +192,7 @@
     "notes": ""
   },
   {
-    "student_name": "Myeonghyun Choi",
+    "student_name": "Myeonghyeon Choi",
     "title": "20250746 ID220012",
     "original_url": "https://choimh0519-ai.github.io/20250746ID220012/",
     "semester": "2026-spring",
@@ -201,19 +201,19 @@
     "archived_date": "2026-06-12",
     "sha256": "fd896d8c7dbe41eeaf1f4ca99356e23604abbfb6212892e482444354cb550c50",
     "status": "ok",
-    "notes": "Confirm course-number-like path from Numbers preview."
+    "notes": ""
   },
   {
     "student_name": "Sohyeon Park",
     "title": "SUN Clock Project",
     "original_url": "https://thgus0407.github.io/sunclock_project/",
     "semester": "2026-spring",
-    "wacz_file": "sohyeon-park-2026-spring.wacz",
-    "wacz_url": "wacz/2026-spring/sohyeon-park-2026-spring.wacz",
-    "archived_date": "2026-06-12",
-    "sha256": "5d57d6683047d3c6b5d26c048860b5b7ae96ba4b3d55145e7f7929b31b6ba030",
-    "status": "ok",
-    "notes": "Numbers sheet lists project title but no visible URL."
+    "wacz_file": "",
+    "wacz_url": "",
+    "archived_date": "",
+    "sha256": "",
+    "status": "pending",
+    "notes": "URL verified live (title matches) — ready to capture."
   },
   {
     "student_name": "Jaemin Han",
@@ -225,7 +225,7 @@
     "archived_date": "",
     "sha256": "",
     "status": "pending",
-    "notes": "No URL visible in Numbers preview."
+    "notes": "No URL provided yet — awaiting student link."
   },
   {
     "student_name": "Seokyoung Yoon",
@@ -261,19 +261,19 @@
     "archived_date": "2026-06-12",
     "sha256": "5ede0f78fa98c50c53b80cbcad7e87564b14f1b5fbd42fec163c279a7f8b0e9d",
     "status": "ok",
-    "notes": "Confirm spelling of GitHub username from Numbers preview."
+    "notes": ""
   },
   {
     "student_name": "Somin Lee",
-    "title": "Protocol Project",
-    "original_url": "https://eesomin0605-oss.github.io/protocol-project/",
+    "title": "Public Surface, Private Object",
+    "original_url": "https://leesomin0605-oss.github.io/protocol-project/",
     "semester": "2026-spring",
-    "wacz_file": "somin-lee-2026-spring.wacz",
-    "wacz_url": "wacz/2026-spring/somin-lee-2026-spring.wacz",
-    "archived_date": "2026-06-12",
-    "sha256": "5658e23358316932ace3a67d48d55fabde0bb3ae711d6bed65767de4c6f996d7",
-    "status": "ok",
-    "notes": ""
+    "wacz_file": "",
+    "wacz_url": "",
+    "archived_date": "",
+    "sha256": "",
+    "status": "pending",
+    "notes": "URL corrected (was eesomin0605) — re-capture."
   },
   {
     "student_name": "Changwon Choi",
@@ -290,26 +290,26 @@
   {
     "student_name": "Suji Lim",
     "title": "Phone Refugees",
-    "original_url": "https://s000j6.github.io/Phone-refugees/",
+    "original_url": "https://s000jing.github.io/Phone-refugees/",
     "semester": "2026-spring",
-    "wacz_file": "suji-lim-2026-spring.wacz",
-    "wacz_url": "wacz/2026-spring/suji-lim-2026-spring.wacz",
-    "archived_date": "2026-06-12",
-    "sha256": "3810e0cefc45a7ad08458909110bebe515d79457749a5f2dfcf39748b49ae6eb",
-    "status": "ok",
-    "notes": "Confirm GitHub username from Numbers preview."
+    "wacz_file": "",
+    "wacz_url": "",
+    "archived_date": "",
+    "sha256": "",
+    "status": "pending",
+    "notes": "URL corrected (was s000j6) — re-capture."
   },
   {
     "student_name": "Seohyun Ahn",
-    "title": "D50-t Press",
-    "original_url": "https://clink14.github.io/D50-t-Press-h",
+    "title": "Don't Press It!",
+    "original_url": "https://clink14.github.io/Don-t-Press-It",
     "semester": "2026-spring",
-    "wacz_file": "seohyun-ahn-2026-spring.wacz",
-    "wacz_url": "wacz/2026-spring/seohyun-ahn-2026-spring.wacz",
-    "archived_date": "2026-06-12",
-    "sha256": "85e952eed33f1a709eee0cac0270129871520cbea640b603baae342028f4c79d",
-    "status": "ok",
-    "notes": "URL was partially blurry in Numbers preview; verify before capture."
+    "wacz_file": "",
+    "wacz_url": "",
+    "archived_date": "",
+    "sha256": "",
+    "status": "pending",
+    "notes": "URL corrected & verified live — ready to capture."
   },
   {
     "student_name": "Gyuri Kim",
@@ -324,7 +324,7 @@
     "notes": ""
   },
   {
-    "student_name": "Hyunjeon Jeong",
+    "student_name": "Hyunjoon Jeong",
     "title": "Invisible Until Noticed",
     "original_url": "https://0826fry.github.io/invisible_until_noticed.github.io/",
     "semester": "2026-spring",
@@ -333,7 +333,7 @@
     "archived_date": "2026-06-12",
     "sha256": "2fee22ce1757a8c232e7d26b622a72e67265e540fda5c07d3d54541715bd309e",
     "status": "ok",
-    "notes": "Numbers note: Modified the QR code. Scan it when you go back to N25."
+    "notes": "Note: QR code modified — scan when back in N25."
   },
   {
     "student_name": "Chaeyoung Huh",
@@ -345,31 +345,31 @@
     "archived_date": "2026-06-12",
     "sha256": "124fa26ec69128ee7384ee7d92f2d618119454ab9649a54c052e3ee9cc2d0d46",
     "status": "ok",
-    "notes": ""
+    "notes": "Interactive site — best viewed on PC."
   },
   {
     "student_name": "Seoyun Oh",
     "title": "Design Studio",
-    "original_url": "https://seoyoon3148-creat2.github.io/DesignStudio1/",
+    "original_url": "https://oseoyoon3148-create.github.io/DesignStudio1/",
     "semester": "2026-spring",
-    "wacz_file": "seoyun-oh-2026-spring.wacz",
-    "wacz_url": "wacz/2026-spring/seoyun-oh-2026-spring.wacz",
-    "archived_date": "2026-06-12",
-    "sha256": "e2823745e77767741b18865e9af2e96f37f99f1c7e37432e817fed7c5ea0d6ce",
-    "status": "ok",
-    "notes": "URL was partially blurry in Numbers preview; verify before capture."
+    "wacz_file": "",
+    "wacz_url": "",
+    "archived_date": "",
+    "sha256": "",
+    "status": "pending",
+    "notes": "URL corrected (was seoyoon3148-creat2) — ready to capture."
   },
   {
     "student_name": "Yeonyoung Kim",
     "title": "Passageway",
-    "original_url": "https://brgnmoru.github.io/passageway/",
+    "original_url": "https://brgnmorum.github.io/passageway/",
     "semester": "2026-spring",
-    "wacz_file": "yeonyoung-kim-2026-spring.wacz",
-    "wacz_url": "wacz/2026-spring/yeonyoung-kim-2026-spring.wacz",
-    "archived_date": "2026-06-12",
-    "sha256": "050a76a243edfc14e3a48ce4d11c74a8bb228644c89c44548d73004b9c52600a",
-    "status": "ok",
-    "notes": ""
+    "wacz_file": "",
+    "wacz_url": "",
+    "archived_date": "",
+    "sha256": "",
+    "status": "pending",
+    "notes": "URL corrected (was brgnmoru) — re-capture."
   },
   {
     "student_name": "Sungmin Park",
@@ -385,38 +385,38 @@
   },
   {
     "student_name": "Kincso Kinga Szilagyi",
-    "title": "",
-    "original_url": "",
+    "title": "Whimsical Bridge Project",
+    "original_url": "https://kinga1912kinga.github.io/Whimsical-Spot-of-KAIST/",
     "semester": "2026-spring",
     "wacz_file": "",
     "wacz_url": "",
     "archived_date": "",
     "sha256": "",
     "status": "pending",
-    "notes": "No URL visible in Numbers preview."
+    "notes": "URL added & verified live — ready to capture."
   },
   {
-    "student_name": "Myeongja Lee",
-    "title": "FD2012 Protocol",
-    "original_url": "https://eemyeongje.github.io/fd2012-protocol/",
+    "student_name": "Myeongje Lee",
+    "title": "Audio Guide",
+    "original_url": "https://leemyeongje.github.io/id20012-protocol/",
     "semester": "2026-spring",
-    "wacz_file": "myeongja-lee-2026-spring.wacz",
-    "wacz_url": "wacz/2026-spring/myeongja-lee-2026-spring.wacz",
-    "archived_date": "2026-06-12",
-    "sha256": "f95b70c0067888be725b71c3bab3383fe501adb68a1ff218c9b592101b66e7cd",
-    "status": "ok",
-    "notes": "Also listed: https://eemyeongje.github.io/fd2012-protocol/about.html"
+    "wacz_file": "",
+    "wacz_url": "",
+    "archived_date": "",
+    "sha256": "",
+    "status": "pending",
+    "notes": "URL corrected (was eemyeongje/fd2012) — re-capture. Also has /about.html."
   },
   {
     "student_name": "Amanbay Makhabbat",
-    "title": "Protocol Project",
-    "original_url": "https://yoandzhy.github.io/Protocol-project/",
+    "title": "Light at the Threshold",
+    "original_url": "https://yoondzhy.github.io/Protocol-project/",
     "semester": "2026-spring",
-    "wacz_file": "amanbay-makhabbat-2026-spring.wacz",
-    "wacz_url": "wacz/2026-spring/amanbay-makhabbat-2026-spring.wacz",
-    "archived_date": "2026-06-12",
-    "sha256": "d1bc222c223aca395fc1a30a917d13a1cdd12cfbcdea1e770e8469c29bcca11e",
-    "status": "ok",
-    "notes": ""
+    "wacz_file": "",
+    "wacz_url": "",
+    "archived_date": "",
+    "sha256": "",
+    "status": "pending",
+    "notes": "URL corrected (was yoandzhy) — re-capture; previous WACZ was near-empty."
   }
 ]

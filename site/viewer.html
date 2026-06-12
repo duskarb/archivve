@@ -53,6 +53,9 @@
         replay.setAttribute("replayBase", "replay/");
         replay.setAttribute("source", source);
         replay.setAttribute("url", url);
+        // 캡처된 페이지만 재생하고 ReplayWeb 자체 주소바/툴바는 숨긴다.
+        // (페이지 위쪽의 자체 viewer-bar로 제목·원본 링크를 이미 제공)
+        replay.setAttribute("embed", "replayonly");
         document.getElementById("viewer-frame").appendChild(replay);
       };
       replayScript.onerror = () => {
