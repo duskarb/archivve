@@ -15,12 +15,6 @@ on:
         options:
           - pending
           - all
-  push:
-    paths:
-      - manifest.csv
-      - site/**
-      - tools/**
-      - .github/workflows/archive.yml
 
 permissions:
   contents: write
