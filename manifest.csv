@@ -1,7 +1,7 @@
 student_name,title,original_url,semester,wacz_file,wacz_url,archived_date,sha256,status,notes
 Seohyeon Gu,Chess,https://gsh0407.github.io/Chess-/,2026-spring,,,,,recapture-needed,
 Jaejun Youn,Protocol,https://yjj8895-git.github.io/protocol/,2026-spring,jaejun-youn-2026-spring.wacz,,2026-06-12,e70cd32a58838a58610475dc183632541534062c3bde6a0082b19e01da82def7,review-needed,
-Yul Jeong,Decision & Action - Protocol,,2026-spring,,,,,review-needed,Numbers sheet lists title text but no visible URL.
+Yul Jeong,Decision & Action - Protocol,https://wjddbf0601.github.io/protocol-project/lastday.html,2026-spring,,,,,review-needed,Numbers sheet lists title text but no visible URL.
 Shakhzoda,Stepping Stone Path,https://shakhzoda006.github.io/stepping-stone-path/,2026-spring,shakhzoda-2026-spring.wacz,,2026-06-12,51cc9d146d8d6d5efce76c50d270aa04f0a73288e17411734e4a17881d8b07a5,review-needed,
 Saimmyo Das Arnob,ID Protocol,https://arnob-lab.github.io/ID-protocol/,2026-spring,saimmyo-das-arnob-2026-spring.wacz,,2026-06-12,1f867652de1c23eeb9ddab632f69f1e7c6bbfb96f817c007d4120d6277b98d10,review-needed,
 Hogeun Yun,Protocol Proj,https://hogeun2f.github.io/protocol_proj/,2026-spring,hogeun-yun-2026-spring.wacz,,2026-06-12,1105437ea98ccb175b80ebe19f3cb5638e683eb1a3ba64fb87cb39bcb65ac8a2,review-needed,
@@ -16,7 +16,7 @@ Seungmin Yang,DS1-B-20210364 Protocol,https://ysm6813.github.io/DS1-B-20210364-p
 HyeonGyu Jeon,,,2026-spring,,,,,review-needed,No URL visible in Numbers preview.
 Bumgyu Suh,Bicycle Park,https://pobadoba.github.io/bicycle-park/,2026-spring,bumgyu-suh-2026-spring.wacz,,2026-06-12,e7d07438723441da49ae0acab28a26f88a81e4ed5d6c38a104ea33bc5c39d56c,review-needed,
 Myeonghyun Choi,20250746 ID220012,https://choimh0519-ai.github.io/20250746ID220012/,2026-spring,myeonghyun-choi-2026-spring.wacz,,2026-06-12,fd896d8c7dbe41eeaf1f4ca99356e23604abbfb6212892e482444354cb550c50,review-needed,Confirm course-number-like path from Numbers preview.
-Sohyeon Park,SUN Clock Project,,2026-spring,,,,,review-needed,Numbers sheet lists project title but no visible URL.
+Sohyeon Park,SUN Clock Project,https://thgus0407.github.io/sunclock_project/,2026-spring,,,,,review-needed,Numbers sheet lists project title but no visible URL.
 Jaemin Han,,,2026-spring,,,,,review-needed,No URL visible in Numbers preview.
 Seokyoung Yoon,Hop the Shortcut,https://sk-y00n.github.io/hop-the-shortcut/,2026-spring,seokyoung-yoon-2026-spring.wacz,,2026-06-12,a61a6a58e4bab2dfb7732272c7978230f13c6db882faf837d1c152660c80fd69,review-needed,
 Balsam Al-Hadithi,Ichi-go Ichi-e,https://lolobalsam1.github.io/ichi-go-ichi-e/index.html,2026-spring,balsam-al-hadithi-2026-spring.wacz,,2026-06-12,e79ecc81d68ed61dd8b692b57a20a9912567eb294d3c46e3776d60ae81aa642e,review-needed,
