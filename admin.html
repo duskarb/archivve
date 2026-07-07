@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Class Web Archive</title>
+  <title>Archive Admin</title>
   <style>
     :root {
       --bg: #ffffff;
@@ -33,7 +33,7 @@
     }
 
     .shell {
-      width: min(1180px, calc(100vw - 28px));
+      width: min(1240px, calc(100vw - 28px));
       margin: 0 auto;
       padding: 14px 0 56px;
     }
@@ -52,6 +52,11 @@
       gap: 16px;
       padding-bottom: 12px;
       text-transform: uppercase;
+    }
+
+    .topbar nav {
+      display: flex;
+      gap: 16px;
     }
 
     .topbar a {
@@ -73,7 +78,6 @@
       margin: 0;
       font-size: 14px;
       font-weight: 400;
-      line-height: 1.35;
       text-transform: uppercase;
     }
 
@@ -85,7 +89,12 @@
 
     .subtitle {
       margin: 12px 0 0;
-      max-width: 620px;
+      max-width: 680px;
+    }
+
+    .subtitle code {
+      background: var(--mark);
+      padding: 1px 5px;
     }
 
     .summary {
@@ -131,10 +140,6 @@
       padding: 0 8px;
     }
 
-    select {
-      max-width: 100%;
-    }
-
     button {
       min-height: 44px;
       border: 0;
@@ -159,7 +164,7 @@
     .list-head,
     .archive-row {
       display: grid;
-      grid-template-columns: 56px minmax(220px, 2fr) minmax(140px, 1fr) 120px minmax(220px, 1.2fr);
+      grid-template-columns: 44px minmax(130px, 1fr) minmax(170px, 1.4fr) 100px 120px 96px minmax(210px, 1.4fr);
       gap: 12px;
       align-items: center;
     }
@@ -180,9 +185,14 @@
       text-transform: uppercase;
     }
 
-    .kind {
-      color: var(--muted);
+    .state {
       text-transform: uppercase;
+    }
+
+    .state.warn {
+      background: var(--mark);
+      padding: 2px 6px;
+      justify-self: start;
     }
 
     .actions {
@@ -204,18 +214,13 @@
       color: var(--bg);
     }
 
-    .actions .none {
-      color: var(--muted);
-      padding: 5px 0;
-    }
-
     .empty {
       margin: 0;
       padding: 28px 0;
       color: var(--muted);
     }
 
-    @media (max-width: 760px) {
+    @media (max-width: 900px) {
       .masthead,
       .toolbar,
       .list-head,
@@ -246,23 +251,26 @@
 </head>
 <body>
   <main class="shell">
-    <nav class="topbar" aria-label="Archive">
-      <span>archivve</span>
-      <a id="sheet-link" href="#" target="_blank" rel="noopener">manifest sheet</a>
+    <nav class="topbar" aria-label="Admin">
+      <span>archivve admin</span>
+      <nav>
+        <a id="sheet-link" href="#" target="_blank" rel="noopener">manifest sheet</a>
+        <a href="index.html">public list</a>
+      </nav>
     </nav>
 
     <header class="masthead">
       <div>
-        <h1>Class Web Archive</h1>
-        <p class="subtitle">같은 폴더의 manifest.csv를 읽어 만드는 아카이브 인덱스입니다. 새 학생 접수는 상단 manifest sheet(이름·수업·링크), 관리는 manifest.csv에서 합니다.</p>
+        <h1>Class Web Archive — 관리 현황</h1>
+        <p class="subtitle">모든 항목(대기·비공개 포함)을 상태와 함께 보여주는 현황판입니다. 새 학생 접수는 <strong>manifest sheet</strong>(이름·수업·링크), 관리(상태·메모 등)는 <code>manifest.csv</code>에서, 캡처는 <code>캡처.command</code>로 합니다.</p>
       </div>
       <div class="summary" aria-live="polite">
-        <span id="item-count">0 works</span>
-        <span id="semester-count">0 semesters</span>
+        <span id="item-count">0 rows</span>
+        <span id="pending-count">0 need capture</span>
       </div>
     </header>
 
-    <section class="toolbar" aria-label="Archive controls">
+    <section class="toolbar" aria-label="Controls">
       <label>
         <span>Search:</span>
         <input id="search" type="search" autocomplete="off">
@@ -276,14 +284,16 @@
       <button id="reload" type="button">Reload</button>
     </section>
 
-    <p class="status" id="status">manifest.csv를 읽는 중입니다.</p>
+    <p class="status" id="status">manifest 시트를 읽는 중입니다.</p>
 
-    <section aria-label="Archived works">
+    <section aria-label="Rows">
       <div class="list-head" aria-hidden="true">
         <span>No.</span>
-        <span>Work</span>
         <span>Student</span>
+        <span>Work</span>
         <span>Semester</span>
+        <span>Status</span>
+        <span>Captured</span>
         <span>Links</span>
       </div>
       <div id="archive-list"></div>
@@ -293,28 +303,21 @@
 
   <script>
     // ── 설정 ──────────────────────────────────────────────────────────
-    // 이 페이지는 같은 폴더의 로컬 manifest.csv만 읽어 목록을 만듭니다. 외부 의존 0.
-    // 명단 편집은 구글 시트에서 하고, 캡처(캡처.command) 때 manifest.csv로 내려받습니다.
-    // 재생(viewer.html)은 서비스워커를 쓰므로 보기.command로 로컬 서버를 띄워 열어야 합니다.
+    // 같은 폴더의 로컬 manifest.csv만 읽는다. 외부 의존 0.
     const VIEWER_URL = "viewer.html";
-    // 상단 "manifest sheet" 링크가 가리키는 편집용 구글 시트.
     const SHEET_EDIT_URL = "https://docs.google.com/spreadsheets/d/1ttG_2q0ZKYopjJmkPUF9S3d3azgE8ymeFPboMheGVig/edit";
     // ──────────────────────────────────────────────────────────────────
 
-    const state = {
-      rows: [],
-      query: "",
-      semester: "",
-    };
+    const state = { rows: [], query: "", semester: "" };
 
     const list = document.getElementById("archive-list");
     const empty = document.getElementById("empty-state");
+    const statusLine = document.getElementById("status");
+    const itemCount = document.getElementById("item-count");
+    const pendingCount = document.getElementById("pending-count");
     const search = document.getElementById("search");
     const semester = document.getElementById("semester");
     const reload = document.getElementById("reload");
-    const statusLine = document.getElementById("status");
-    const itemCount = document.getElementById("item-count");
-    const semesterCount = document.getElementById("semester-count");
 
     document.getElementById("sheet-link").href = SHEET_EDIT_URL;
 
@@ -373,11 +376,6 @@
         });
     }
 
-    function isVisible(row) {
-      const status = clean(row.status).toLowerCase();
-      return status !== "private" && status !== "hidden";
-    }
-
     function slugify(value) {
       let out = "";
       for (const char of String(value).toLowerCase()) {
@@ -390,8 +388,8 @@
       return out.split("-").filter(Boolean).join("-") || "untitled";
     }
 
-    // 크롤러(tools/crawl_manifest.py)와 같은 규칙으로 wacz 파일명을 정한다.
-    function waczFile(row) {
+    // 크롤러(tools/crawl_manifest.py)와 같은 규칙으로 행을 식별한다.
+    function rowKey(row) {
       const file = clean(row.wacz_file);
       if (file) return file;
       const base = clean(row.student_name) || clean(row.title);
@@ -399,11 +397,16 @@
       return `${slugify(base)}-${slugify(term)}.wacz`;
     }
 
+    function needsCapture(row) {
+      const status = clean(row.status).toLowerCase();
+      return status === "" || status === "pending" || status === "recapture-needed";
+    }
+
     // 재생 소스는 항상 로컬 상대경로 wacz/<semester>/<file> 로 계산한다.
-    // 캡처가 안 된 행(대기)은 실제 파일이 없으므로 재생 버튼을 만들지 않는다.
+    // wacz 파일이 아직 없는 행(대기)은 재생 버튼을 만들지 않는다.
     function archiveUrl(row) {
-      if (!clean(row.wacz_file) || clean(row.status).toLowerCase() !== "ok") return "";
-      const source = `wacz/${clean(row.semester)}/${waczFile(row)}`;
+      if (!clean(row.wacz_file)) return "";
+      const source = `wacz/${clean(row.semester)}/${rowKey(row)}`;
       const params = new URLSearchParams({
         title: clean(row.title) || clean(row.original_url),
         student: clean(row.student_name),
@@ -416,24 +419,15 @@
     function matches(row) {
       const q = state.query.toLowerCase();
       const haystack = [
-        row.title,
-        row.student_name,
-        row.type,
-        row.semester,
-        row.original_url,
-        row.notes,
+        row.title, row.student_name, row.type, row.semester, row.original_url, row.status, row.notes,
       ].map(clean).join(" ").toLowerCase();
-
-      return isVisible(row) &&
-        (!state.semester || clean(row.semester) === state.semester) &&
+      return (!state.semester || clean(row.semester) === state.semester) &&
         (!q || haystack.includes(q));
     }
 
     function renderSummary() {
-      const rows = state.rows.filter(isVisible);
-      const semesters = new Set(rows.map((row) => clean(row.semester)).filter(Boolean));
-      itemCount.textContent = `${rows.length} works`;
-      semesterCount.textContent = `${semesters.size} semesters`;
+      itemCount.textContent = `${state.rows.length} rows`;
+      pendingCount.textContent = `${state.rows.filter(needsCapture).length} need capture`;
     }
 
     function renderSemesterOptions() {
@@ -442,14 +436,12 @@
       const values = Array.from(
         new Set(state.rows.map((row) => clean(row.semester)).filter(Boolean))
       ).sort().reverse();
-
       for (const value of values) {
         const option = document.createElement("option");
         option.value = value;
         option.textContent = value;
         semester.appendChild(option);
       }
-
       semester.value = values.includes(current) ? current : "";
       state.semester = semester.value;
     }
@@ -475,22 +467,24 @@
         const number = document.createElement("span");
         number.textContent = String(index + 1).padStart(2, "0");
 
-        const work = document.createElement("span");
-        work.className = "work";
-        work.textContent = clean(row.title) || "Untitled";
-        const kind = clean(row.type).toLowerCase();
-        if (kind && kind !== "work") {
-          const badge = document.createElement("span");
-          badge.className = "kind";
-          badge.textContent = ` · ${kind}`;
-          work.appendChild(badge);
-        }
-
         const student = document.createElement("span");
         student.textContent = clean(row.student_name) || "-";
 
+        const work = document.createElement("span");
+        work.className = "work";
+        work.textContent = clean(row.title) || "Untitled";
+
         const term = document.createElement("span");
         term.textContent = clean(row.semester) || "-";
+
+        const status = clean(row.status).toLowerCase() || "pending";
+        const stateCell = document.createElement("span");
+        stateCell.className = "state";
+        stateCell.textContent = status;
+        if (status !== "ok") stateCell.classList.add("warn");
+
+        const captured = document.createElement("span");
+        captured.textContent = clean(row.archived_date) || "-";
 
         const actions = document.createElement("span");
         actions.className = "actions";
@@ -498,38 +492,34 @@
         if (replay) actions.appendChild(actionLink("Archive", replay));
         if (clean(row.original_url)) actions.appendChild(actionLink("Original", clean(row.original_url)));
         if (clean(row.drive_link)) actions.appendChild(actionLink("Drive", clean(row.drive_link)));
-        if (!actions.childElementCount) {
-          const none = document.createElement("span");
-          none.className = "none";
-          none.textContent = clean(row.status) || "pending";
-          actions.appendChild(none);
-        }
 
-        item.append(number, work, student, term, actions);
+        item.append(number, student, work, term, stateCell, captured, actions);
         list.appendChild(item);
       });
     }
 
-    function setRows(rows, sourceLabel) {
-      state.rows = rows;
+    function render() {
       renderSummary();
       renderSemesterOptions();
       renderRows();
-      statusLine.textContent = `${sourceLabel}에서 ${rows.length}개 항목을 읽었습니다.`;
     }
 
-    // 같은 폴더의 로컬 manifest.csv만 읽는다. (localhost로 서빙되면 fetch가 동작한다)
-    function loadManifest() {
+    function load() {
       statusLine.textContent = "manifest.csv를 읽는 중입니다.";
       fetch("manifest.csv", { cache: "no-store" })
         .then((response) => {
           if (!response.ok) throw new Error("manifest.csv");
           return response.text();
         })
-        .then((text) => setRows(parseCsv(text), "manifest.csv"))
+        .then((text) => {
+          state.rows = parseCsv(text);
+          render();
+          statusLine.textContent = `manifest.csv에서 ${state.rows.length}개 행을 읽었습니다.`;
+        })
         .catch(() => {
-          setRows([], "manifest.csv");
-          statusLine.textContent = "manifest.csv를 읽지 못했습니다. index.html을 직접 열지 말고 보기.command로 실행해 주세요.";
+          state.rows = [];
+          render();
+          statusLine.textContent = "manifest.csv를 읽지 못했습니다. admin.html을 직접 열지 말고 보기.command로 실행해 주세요.";
         });
     }
 
@@ -543,9 +533,9 @@
       renderRows();
     });
 
-    reload.addEventListener("click", loadManifest);
+    reload.addEventListener("click", load);
 
-    loadManifest();
+    load();
   </script>
 </body>
 </html>

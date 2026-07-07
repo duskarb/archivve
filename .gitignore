@@ -1,6 +1,7 @@
 .DS_Store
 __pycache__/
 *.pyc
-crawls/
-out/
-site/wacz/
+
+# 아카이브 파일은 폴더(디스크·USB) 자체가 보관 매체다. 대용량이라 git에는 담지 않는다.
+# 백업은 폴더를 USB/드라이브에 복사하는 방식으로 한다.
+wacz/

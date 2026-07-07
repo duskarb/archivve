@@ -1,119 +1,107 @@
-# ID20012: Design Studio 1 Archive
+# archivve — 수업 웹 아카이브
 
-Exploring Aesthetics and Form Giving  
-KAIST Industrial Design / Spring 2026
+학생들의 웹 작업물을 **10~20년 장기 보존**하는 아주 단순한 아카이브 도구.
 
-학생 웹 작업물을 학기마다 장기 보존하는 정적 아카이브 파이프라인.
+핵심은 하나다: **이 폴더가 곧 아카이브다.** 폴더 안에 목록 페이지(index.html),
+명단(manifest.csv), 아카이브 파일(wacz/), 재생기(replay/)가 다 들어 있다.
+외부 서비스에 의존하지 않으므로 USB나 드라이브에 복사해 두면 그대로 보존된다.
+파일 포맷은 WACZ/WARC(웹 아카이브 국제표준 ISO 28500)라 먼 미래에도 열 수 있다.
 
-핵심 원칙: **WACZ/WARC 표준 포맷 + 서버 없는 재생 + 사람이 읽는 매니페스트 +
-다중 백업.** GitHub Actions/Pages/Releases는 빠르게 시작하기 위한 MVP 도구이고,
-장기 보존 원본은 GitHub 밖(학교/연구실 저장소, NAS, S3 호환 저장소 등)에
-별도로 복제한다.
+---
 
-전체 설계와 운영 매뉴얼은 [docs/운영가이드.md](docs/운영가이드.md) 참고.
+## 역할 분담
 
-## 로컬 폴더용 간단 버전
+- **구글 시트 = 접수함.** 새 학생의 **이름·수업·링크**만 넣는 곳. (학생에게 직접 채우게 해도 된다.)
+- **manifest.csv = 관리 원본.** 캡처 결과·상태·메모 등 모든 관리는 여기서 한다. 편집은 Numbers·Excel·텍스트로.
 
-서버, GitHub, 로그인 없이 Google Drive 폴더 안에서만 보여줄 때는 루트의
-`index.html`과 `manifest.csv`를 같은 폴더에 두면 된다. 교수자나 조교가
-`index.html`을 더블클릭하면 CSV를 읽어 목록을 만들고, 각 행을 누르면 CSV에 적힌
-파일 경로나 URL을 연다.
+`캡처.command`가 시트의 **새 학생만** manifest.csv로 가져오고(pending으로 추가),
+이미 있는 학생의 관리 데이터는 절대 건드리지 않는다. 그래서 두 곳이 안 싸운다.
 
-브라우저 보안 정책 때문에 로컬 CSV 자동 읽기가 막히는 경우가 있다. 이때는 화면의
-`CSV` 선택 버튼에서 같은 폴더의 `manifest.csv`를 한 번 골라 주면 된다.
+## 평소 사용법 — 3단계
 
-로컬 인덱스가 우선해서 읽는 컬럼은 다음과 같다.
+### 1. 접수 (구글 시트)
+[manifest 시트](https://docs.google.com/spreadsheets/d/1ttG_2q0ZKYopjJmkPUF9S3d3azgE8ymeFPboMheGVig/edit)에
+새 학생을 한 줄 추가한다. 필요한 칸은 셋뿐:
 
-- 작품명: `title`, `work`, `name`
-- 학생명: `student_name`, `student`, `author`
-- 수업/학기: `semester`, `class`, `course`
-- 열람 대상: `archive_file`, `file`, `path`, `local_file`, `wacz_file`, 없으면
-  `url`, `original_url`, `link`
-- 숨김 처리: `status`가 `private` 또는 `hidden`이면 목록에서 제외
+| 칸 | 예시 |
+|---|---|
+| `student_name` | Jane Doe |
+| `semester` | 2027-spring |
+| `original_url` | https://jane-doe.github.io/project/ |
 
-## 구조
+`semester`가 학기(또는 수업) 구분이다. 새 수업이 추가돼도 새 `semester`
+이름만 적으면 된다 — 폴더는 캡처할 때 자동으로 만들어진다.
+(상태·제목·메모 등 나머지 관리는 캡처 후 manifest.csv에서 한다.)
 
-- `manifest.csv` — 단일 출처(single source of truth). 학생 한 명당 한 줄.
-- `2026 design studio.numbers` — Spring 2026 제출 링크 원본 스프레드시트.
-- `site/` — 빌드 단계 없는 정적 아카이브 사이트 (GitHub Pages 또는 아무 정적 서버).
-- `site/replay/` — replayweb.page 런타임(`ui.js`, `sw.js`)을 버전 고정해 자가호스팅.
-- `tools/` — 서드파티 의존성 없는 파이썬 스크립트.
-- `.github/workflows/archive.yml` — 매니페스트 변경 시 자동 크롤링 → WACZ 생성 →
-  체크섬 기록 → Releases 업로드 → Pages 재생용 사본 배포.
+### 2. 캡처 (`캡처.command` 더블클릭)
+시트에서 새 학생을 가져온 뒤, **캡처할 작품 목록을 보여주고 엔터 한 번**이면
+아직 캡처 안 된 작품을 `wacz/<학기>/`에 저장한다. Docker도, 로그인도, 토큰도
+필요 없다. (처음 실행 시 캡처 도구 설치를 물어보고 자동으로 깔아준다.)
 
-## 운영 워크플로우 (CSV → 자동 아카이브)
+> 특정 학생을 **다시** 캡처하려면 `manifest.csv`에서 그 학생 `status`를
+> `recapture-needed`로 바꾸고 다시 실행하면 된다.
 
-1. 학생에게서 로그인 없이 접근 가능한 **공개 URL**을 받는다.
-2. `manifest.csv`에 한 줄 추가한다: 이름, 제목, URL, 학기(예: `2026-spring`).
-3. `status`를 비워 두거나 `pending`으로 둔다.
-4. 커밋·푸시하면 Actions가 `manifest.csv`를 읽고 pending 행만 자동으로 크롤링한다.
-5. 캡처가 끝난 행은 자동으로 `review-needed`가 되고, `wacz_file`,
-   `archived_date`, `sha256`이 채워진다.
-6. 캡처된 작품을 ReplayWeb.page에서 직접 열어 재생 품질을 확인한 뒤
-   `status`를 갱신한다. **캡처 성공과 재생 성공은 다르다** — 자동 캡처 직후
-   상태는 `review-needed`이며, 사람이 확인해야 `ok`가 된다.
-7. 그 학기 WACZ 묶음을 장기 저장소와 외부 백업에 복제한다(아래 백업 위치).
+### 3. 보기 (`보기.command` 더블클릭)
+로컬 서버를 띄우고 브라우저로 아카이브 목록을 연다. 각 항목의 **Archive** 버튼을
+누르면 보존된 사이트가 그대로 재생된다.
 
-일상 운영에서는 GitHub Actions 화면을 직접 열 필요가 없다. `manifest.csv`가
-크롤링 큐 역할을 한다.
+> `index.html`을 직접 더블클릭하지 말 것. 재생(WACZ)이 서비스워커를 쓰기 때문에
+> 반드시 `보기.command`로 로컬 서버를 통해 열어야 재생된다.
 
-## 첫 크롤링 테스트
+---
 
-처음에는 전체 학생을 한 번에 돌리지 말고, `manifest.csv`에서 테스트할 학생
-1명만 `pending`으로 두고 나머지는 `review-needed` 또는 `private`처럼 캡처 대상이
-아닌 상태로 둔다. 그 상태로 커밋·푸시하면 CSV에서 바로 한 명만 크롤링된다.
+## 최초 1회 준비 (캡처하는 Mac에서만)
 
-수동으로 테스트하고 싶다면 Actions 화면에서도 한 명만 실행할 수 있다.
+캡처에는 파이썬 도구가 필요하다. 한 번만 설치한다:
 
-1. GitHub 레포의 **Actions** 탭으로 간다.
-2. **Archive student sites** workflow를 선택한다.
-3. **Run workflow**를 누르고 아래처럼 입력한다.
-   - `semester`: `2026-spring`
-   - `mode`: `pending`
-   - `match`: `Seohyeon Gu` 처럼 학생 이름 또는 작품 제목
-   - `page_limit`: `30`
-   - `depth`: `3`
-4. 실행이 끝나면 GitHub Releases에 `.wacz` 파일이 올라가고,
-   `manifest.csv`의 `wacz_file`, `archived_date`, `sha256`, `status`가 갱신된다.
-5. 재생을 확인한 뒤 문제가 없으면 `status`를 `ok`로 바꾼다.
+```
+python3 -m pip install playwright warcio wacz
+python3 -m playwright install chromium
+```
 
-여러 명이 안정적으로 성공한 뒤 `match`를 비워 전체 pending 항목을 크롤링한다.
+*보기*는 macOS에 기본 내장된 python만 있으면 되므로 추가 설치가 필요 없다.
 
-## 검수 상태값 (`status`)
+처음 `.command` 파일을 더블클릭하면 "확인되지 않은 개발자" 경고가 뜰 수 있다.
+그럴 땐 파일을 **우클릭 → 열기**를 한 번만 하면 이후로는 그냥 더블클릭된다.
 
-| status | 의미 | 공개 여부 |
-|---|---|---|
-| `ok` | 재생 확인 완료 | 공개 (재생 가능) |
-| `review-needed` | 자동 캡처는 됐지만 사람이 확인해야 함 | 목록에 표시, Review 재생 가능 |
-| `partial` | 일부 리소스/인터랙션 누락 | 공개, `notes`에 주석 필수 |
-| `recapture-needed` | 다시 캡처해야 함 (다음 실행 시 자동 재캡처) | 숨김 |
-| `private` | 학생 요청/저작권/개인정보 문제 | 비공개 (캡처·색인 모두 제외) |
+---
 
-빈 status 또는 `pending`은 아직 캡처 전이라는 뜻이며 다음 실행 때 캡처된다.
+## 폴더 구조
 
-## 인수인계 안내
+```
+archivve/
+├── index.html      공개 목록 (manifest.csv를 읽음)
+├── admin.html      운영 현황 (대기·비공개 포함 + 상태)
+├── viewer.html     재생 페이지
+├── manifest.csv    관리 원본 (모든 상태·결과가 여기 있음)
+├── replay/         재생기 런타임 (replayweb.page, 벤더링됨)
+├── wacz/<학기>/     아카이브 파일 (.wacz)
+├── 캡처.command     명단 갱신 + 캡처
+├── 보기.command     로컬 서버 + 브라우저 열기
+└── tools/          파이썬 도구 3개 (capture / crawl / sync)
+```
 
-담당자(교수님/조교)가 바뀔 때 아래 네 가지만 채워서 넘기면 된다.
+---
 
-- **(a) 계정 접근**: 이 레포를 소유한 GitHub 계정/조직과 접근 권한 위치를
-  여기에 기록한다. 개인 계정보다 수업용 조직 계정을 권장.
-- **(b) 매니페스트에 줄 추가하는 법**: 위 운영 워크플로우 2번. GitHub 웹
-  화면에서 `manifest.csv`를 바로 편집·커밋해도 된다.
-- **(c) replayweb.page 고정 버전**: `site/replay/`에 받아 둔 `ui.js`/`sw.js`의
-  버전을 [site/replay/README.md](site/replay/README.md)에 기록한다. CDN을 쓰지
-  않으므로 업스트림이 바뀌어도 사이트는 동일하게 동작한다.
-- **(d) 백업 위치**: WACZ 원본을 복제해 둔 곳(학교/연구실 저장소, NAS,
-  객체저장소, Internet Archive 등)을 여기에 기록한다. 3-2-1 규칙: 최소 3벌,
-  2종류 매체, 1벌은 외부에.
+## 백업 (중요)
 
-## 장기 보존 메모
+저장 매체가 이 폴더 하나이므로, **폴더를 USB나 드라이브에 통째로 복사**해
+사본을 한 벌 이상 보관한다. WACZ는 자족적 파일이라 복사만으로 보존된다.
+학기말마다 한 번씩 복사해 두면 충분하다.
 
-- 각 WACZ의 SHA-256 체크섬이 매니페스트에 기록된다. 1년에 한 번 같은
-  해시인지 확인(fixity 점검)하고, 다르면 백업본과 비교한다.
-- GitHub Releases는 장기 보관/다운로드용 사본이고, GitHub Pages에는 재생을 위한
-  같은 출처(`site/wacz/`) 사본이 배포된다. 브라우저 재생기는 CORS 제한 때문에
-  Release 다운로드 URL을 직접 읽지 못할 수 있다.
-- 저장 위치를 옮기면 매니페스트의 `wacz_url` 또는 빌드 환경의
-  `ARCHIVE_PUBLIC_WACZ_BASE`를 바꾸면 된다.
-- 자동 크롤링이 약한 인터랙티브 작품은 ArchiveWeb.page로 수동 캡처해 같은
-  WACZ로 이 파이프라인에 넣을 수 있다.
+## 상태(status) 값
+
+| status | 의미 |
+|---|---|
+| `pending` | 아직 캡처 안 됨 (캡처 대상) |
+| `ok` | 캡처 완료, 목록에 공개 |
+| `recapture-needed` | 다시 캡처 필요 (다음 실행에서 재캡처) |
+| `private` / `hidden` | 공개 목록에서 숨김 |
+
+## 참고
+
+- 자동 캡처가 약한 인터랙티브 작품은 [ArchiveWeb.page](https://webrecorder.net/archivewebpage)로
+  수동 캡처해, 파일명을 `wacz/<학기>/<slug>.wacz` 규칙에 맞춰 넣어도 된다.
+- 재생기(replay/)는 서비스워커 기반이라 먼 미래에 브라우저가 못 돌릴 수 있지만,
+  WACZ 안의 WARC는 표준이라 그때의 어떤 도구로든 다시 열 수 있다. 원본 WACZ를
+  잘 보관하는 것이 가장 중요하다.
