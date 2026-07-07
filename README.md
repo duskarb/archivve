@@ -12,6 +12,25 @@ KAIST Industrial Design / Spring 2026
 
 전체 설계와 운영 매뉴얼은 [docs/운영가이드.md](docs/운영가이드.md) 참고.
 
+## 로컬 폴더용 간단 버전
+
+서버, GitHub, 로그인 없이 Google Drive 폴더 안에서만 보여줄 때는 루트의
+`index.html`과 `manifest.csv`를 같은 폴더에 두면 된다. 교수자나 조교가
+`index.html`을 더블클릭하면 CSV를 읽어 목록을 만들고, 각 행을 누르면 CSV에 적힌
+파일 경로나 URL을 연다.
+
+브라우저 보안 정책 때문에 로컬 CSV 자동 읽기가 막히는 경우가 있다. 이때는 화면의
+`CSV` 선택 버튼에서 같은 폴더의 `manifest.csv`를 한 번 골라 주면 된다.
+
+로컬 인덱스가 우선해서 읽는 컬럼은 다음과 같다.
+
+- 작품명: `title`, `work`, `name`
+- 학생명: `student_name`, `student`, `author`
+- 수업/학기: `semester`, `class`, `course`
+- 열람 대상: `archive_file`, `file`, `path`, `local_file`, `wacz_file`, 없으면
+  `url`, `original_url`, `link`
+- 숨김 처리: `status`가 `private` 또는 `hidden`이면 목록에서 제외
+
 ## 구조
 
 - `manifest.csv` — 단일 출처(single source of truth). 학생 한 명당 한 줄.

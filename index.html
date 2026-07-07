@@ -1,0 +1,547 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Class Web Archive</title>
+  <style>
+    :root {
+      --bg: #ffffff;
+      --text: #111111;
+      --muted: #666666;
+      --line: #111111;
+      --soft-line: #dddddd;
+      --mark: #f4e850;
+      --font: Arial, "Helvetica Neue", sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      font-size: 14px;
+      line-height: 1.35;
+    }
+
+    a {
+      color: inherit;
+    }
+
+    .shell {
+      width: min(1180px, calc(100vw - 28px));
+      margin: 0 auto;
+      padding: 14px 0 56px;
+    }
+
+    .topbar,
+    .masthead,
+    .toolbar,
+    .list-head,
+    .archive-row {
+      border-bottom: 1px solid var(--line);
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      padding-bottom: 12px;
+      text-transform: uppercase;
+    }
+
+    .topbar a {
+      text-decoration: none;
+    }
+
+    .topbar a:hover {
+      background: var(--mark);
+    }
+
+    .masthead {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) max-content;
+      gap: 20px;
+      padding: 16px 0 18px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 14px;
+      font-weight: 400;
+      line-height: 1.35;
+      text-transform: uppercase;
+    }
+
+    .subtitle,
+    .summary,
+    .status {
+      color: var(--muted);
+    }
+
+    .subtitle {
+      margin: 12px 0 0;
+      max-width: 620px;
+    }
+
+    .summary {
+      display: grid;
+      gap: 6px;
+      min-width: 160px;
+      text-align: right;
+      text-transform: uppercase;
+    }
+
+    .toolbar {
+      display: grid;
+      grid-template-columns: minmax(180px, 1fr) minmax(150px, 220px) max-content;
+      gap: 0;
+      align-items: center;
+    }
+
+    label {
+      display: grid;
+      grid-template-columns: max-content minmax(0, 1fr);
+      gap: 10px;
+      align-items: center;
+      min-height: 44px;
+      padding-right: 12px;
+      border-right: 1px solid var(--line);
+      text-transform: uppercase;
+    }
+
+    label:last-of-type {
+      border-right: 0;
+    }
+
+    input,
+    select,
+    button {
+      font: inherit;
+    }
+
+    input[type="search"] {
+      width: 100%;
+      height: 36px;
+      border: 0;
+      padding: 0 8px;
+    }
+
+    select {
+      max-width: 100%;
+    }
+
+    button {
+      min-height: 44px;
+      border: 0;
+      border-left: 1px solid var(--line);
+      background: #fff;
+      color: var(--text);
+      padding: 0 12px;
+      cursor: pointer;
+      text-transform: uppercase;
+    }
+
+    button:hover,
+    .archive-row:hover {
+      background: var(--mark);
+    }
+
+    .status {
+      padding: 12px 0;
+      border-bottom: 1px solid var(--soft-line);
+    }
+
+    .list-head,
+    .archive-row {
+      display: grid;
+      grid-template-columns: 56px minmax(220px, 2fr) minmax(140px, 1fr) 120px minmax(220px, 1.2fr);
+      gap: 12px;
+      align-items: center;
+    }
+
+    .list-head {
+      min-height: 34px;
+      text-transform: uppercase;
+    }
+
+    .archive-row {
+      min-height: 54px;
+      padding: 8px 0;
+      border-color: var(--soft-line);
+    }
+
+    .work {
+      overflow-wrap: anywhere;
+      text-transform: uppercase;
+    }
+
+    .kind {
+      color: var(--muted);
+      text-transform: uppercase;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .actions a {
+      border: 1px solid var(--line);
+      padding: 5px 10px;
+      text-decoration: none;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .actions a:hover {
+      background: var(--text);
+      color: var(--bg);
+    }
+
+    .actions .none {
+      color: var(--muted);
+      padding: 5px 0;
+    }
+
+    .empty {
+      margin: 0;
+      padding: 28px 0;
+      color: var(--muted);
+    }
+
+    @media (max-width: 760px) {
+      .masthead,
+      .toolbar,
+      .list-head,
+      .archive-row {
+        grid-template-columns: 1fr;
+      }
+
+      .summary {
+        text-align: left;
+      }
+
+      label {
+        border-right: 0;
+        border-bottom: 1px solid var(--soft-line);
+        padding-right: 0;
+      }
+
+      button {
+        border-left: 0;
+        border-top: 1px solid var(--line);
+      }
+
+      .list-head {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <nav class="topbar" aria-label="Archive">
+      <span>archivve</span>
+      <a id="sheet-link" href="#" target="_blank" rel="noopener">manifest sheet</a>
+    </nav>
+
+    <header class="masthead">
+      <div>
+        <h1>Class Web Archive</h1>
+        <p class="subtitle">구글 시트 manifest를 읽어 자동으로 만들어지는 아카이브 인덱스입니다. 시트에 행을 추가하면 이 페이지에 바로 반영됩니다.</p>
+      </div>
+      <div class="summary" aria-live="polite">
+        <span id="item-count">0 works</span>
+        <span id="semester-count">0 semesters</span>
+      </div>
+    </header>
+
+    <section class="toolbar" aria-label="Archive controls">
+      <label>
+        <span>Search:</span>
+        <input id="search" type="search" autocomplete="off">
+      </label>
+      <label>
+        <span>Semester:</span>
+        <select id="semester">
+          <option value="">All</option>
+        </select>
+      </label>
+      <button id="reload" type="button">Reload</button>
+    </section>
+
+    <p class="status" id="status">manifest 시트를 읽는 중입니다.</p>
+
+    <section aria-label="Archived works">
+      <div class="list-head" aria-hidden="true">
+        <span>No.</span>
+        <span>Work</span>
+        <span>Student</span>
+        <span>Semester</span>
+        <span>Links</span>
+      </div>
+      <div id="archive-list"></div>
+      <p class="empty" id="empty-state" hidden>표시할 항목이 없습니다.</p>
+    </section>
+  </main>
+
+  <script>
+    // ── 설정 ──────────────────────────────────────────────────────────
+    // 메타데이터를 관리하는 구글 시트(제목: manifest).
+    // 시트가 "링크가 있는 모든 사용자 - 뷰어"로 공유되어 있어야 로그인 없이 읽힙니다.
+    const SHEET_ID = "1ttG_2q0ZKYopjJmkPUF9S3d3azgE8ymeFPboMheGVig";
+    const SHEET_CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv`;
+    const SHEET_EDIT_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/edit`;
+    // WACZ 재생에 쓰는 뷰어(주소창을 숨긴 ReplayWeb 페이지).
+    const VIEWER_URL = "https://duskarb.github.io/archivve/viewer.html";
+    // ──────────────────────────────────────────────────────────────────
+
+    const state = {
+      rows: [],
+      query: "",
+      semester: "",
+    };
+
+    const list = document.getElementById("archive-list");
+    const empty = document.getElementById("empty-state");
+    const search = document.getElementById("search");
+    const semester = document.getElementById("semester");
+    const reload = document.getElementById("reload");
+    const statusLine = document.getElementById("status");
+    const itemCount = document.getElementById("item-count");
+    const semesterCount = document.getElementById("semester-count");
+
+    document.getElementById("sheet-link").href = SHEET_EDIT_URL;
+
+    function clean(value) {
+      return String(value || "").trim();
+    }
+
+    function parseCsv(text) {
+      const rows = [];
+      let row = [];
+      let cell = "";
+      let quoted = false;
+
+      for (let i = 0; i < text.length; i += 1) {
+        const char = text[i];
+        const next = text[i + 1];
+
+        if (quoted) {
+          if (char === '"' && next === '"') {
+            cell += '"';
+            i += 1;
+          } else if (char === '"') {
+            quoted = false;
+          } else {
+            cell += char;
+          }
+        } else if (char === '"') {
+          quoted = true;
+        } else if (char === ",") {
+          row.push(cell);
+          cell = "";
+        } else if (char === "\n") {
+          row.push(cell);
+          rows.push(row);
+          row = [];
+          cell = "";
+        } else if (char !== "\r") {
+          cell += char;
+        }
+      }
+
+      if (cell || row.length) {
+        row.push(cell);
+        rows.push(row);
+      }
+
+      const headers = (rows.shift() || []).map(clean);
+      return rows
+        .filter((values) => values.some(clean))
+        .map((values) => {
+          const item = {};
+          headers.forEach((header, index) => {
+            item[header] = clean(values[index]);
+          });
+          return item;
+        });
+    }
+
+    function isVisible(row) {
+      const status = clean(row.status).toLowerCase();
+      return status !== "private" && status !== "hidden";
+    }
+
+    function archiveUrl(row) {
+      const source = clean(row.wacz_url);
+      if (!source) return "";
+      const params = new URLSearchParams({
+        title: clean(row.title) || clean(row.original_url),
+        student: clean(row.student_name),
+        url: clean(row.original_url),
+        source,
+      });
+      return `${VIEWER_URL}?${params.toString()}`;
+    }
+
+    function matches(row) {
+      const q = state.query.toLowerCase();
+      const haystack = [
+        row.title,
+        row.student_name,
+        row.type,
+        row.semester,
+        row.original_url,
+        row.notes,
+      ].map(clean).join(" ").toLowerCase();
+
+      return isVisible(row) &&
+        (!state.semester || clean(row.semester) === state.semester) &&
+        (!q || haystack.includes(q));
+    }
+
+    function renderSummary() {
+      const rows = state.rows.filter(isVisible);
+      const semesters = new Set(rows.map((row) => clean(row.semester)).filter(Boolean));
+      itemCount.textContent = `${rows.length} works`;
+      semesterCount.textContent = `${semesters.size} semesters`;
+    }
+
+    function renderSemesterOptions() {
+      const current = semester.value;
+      semester.innerHTML = '<option value="">All</option>';
+      const values = Array.from(
+        new Set(state.rows.map((row) => clean(row.semester)).filter(Boolean))
+      ).sort().reverse();
+
+      for (const value of values) {
+        const option = document.createElement("option");
+        option.value = value;
+        option.textContent = value;
+        semester.appendChild(option);
+      }
+
+      semester.value = values.includes(current) ? current : "";
+      state.semester = semester.value;
+    }
+
+    function actionLink(label, href) {
+      const link = document.createElement("a");
+      link.textContent = label;
+      link.href = href;
+      link.target = "_blank";
+      link.rel = "noopener";
+      return link;
+    }
+
+    function renderRows() {
+      list.innerHTML = "";
+      const rows = state.rows.filter(matches);
+      empty.hidden = rows.length > 0;
+
+      rows.forEach((row, index) => {
+        const item = document.createElement("div");
+        item.className = "archive-row";
+
+        const number = document.createElement("span");
+        number.textContent = String(index + 1).padStart(2, "0");
+
+        const work = document.createElement("span");
+        work.className = "work";
+        work.textContent = clean(row.title) || "Untitled";
+        const kind = clean(row.type).toLowerCase();
+        if (kind && kind !== "work") {
+          const badge = document.createElement("span");
+          badge.className = "kind";
+          badge.textContent = ` · ${kind}`;
+          work.appendChild(badge);
+        }
+
+        const student = document.createElement("span");
+        student.textContent = clean(row.student_name) || "-";
+
+        const term = document.createElement("span");
+        term.textContent = clean(row.semester) || "-";
+
+        const actions = document.createElement("span");
+        actions.className = "actions";
+        const replay = archiveUrl(row);
+        if (replay) actions.appendChild(actionLink("Archive", replay));
+        if (clean(row.original_url)) actions.appendChild(actionLink("Original", clean(row.original_url)));
+        if (clean(row.drive_link)) actions.appendChild(actionLink("Drive", clean(row.drive_link)));
+        if (!actions.childElementCount) {
+          const none = document.createElement("span");
+          none.className = "none";
+          none.textContent = clean(row.status) || "pending";
+          actions.appendChild(none);
+        }
+
+        item.append(number, work, student, term, actions);
+        list.appendChild(item);
+      });
+    }
+
+    function setRows(rows, sourceLabel) {
+      state.rows = rows;
+      renderSummary();
+      renderSemesterOptions();
+      renderRows();
+      statusLine.textContent = `${sourceLabel}에서 ${rows.length}개 항목을 읽었습니다.`;
+    }
+
+    function looksLikeManifest(rows) {
+      return rows.length > 0 && rows.some((row) => "student_name" in row || "title" in row);
+    }
+
+    function loadLocalCsv() {
+      return fetch("manifest.csv", { cache: "no-store" })
+        .then((response) => {
+          if (!response.ok) throw new Error("manifest.csv");
+          return response.text();
+        })
+        .then((text) => setRows(parseCsv(text), "로컬 manifest.csv"));
+    }
+
+    function loadSheet() {
+      statusLine.textContent = "manifest 시트를 읽는 중입니다.";
+      fetch(SHEET_CSV_URL, { cache: "no-store" })
+        .then((response) => {
+          if (!response.ok) throw new Error("sheet");
+          return response.text();
+        })
+        .then((text) => {
+          const rows = parseCsv(text);
+          if (!looksLikeManifest(rows)) throw new Error("sheet-format");
+          setRows(rows, "구글 시트 manifest");
+        })
+        .catch(() => {
+          loadLocalCsv().catch(() => {
+            setRows([], "시트");
+            statusLine.textContent = "manifest 시트를 읽지 못했습니다. 시트가 '링크가 있는 모든 사용자 - 뷰어'로 공유되어 있는지 확인해 주세요.";
+          });
+        });
+    }
+
+    search.addEventListener("input", (event) => {
+      state.query = event.target.value;
+      renderRows();
+    });
+
+    semester.addEventListener("change", (event) => {
+      state.semester = event.target.value;
+      renderRows();
+    });
+
+    reload.addEventListener("click", loadSheet);
+
+    loadSheet();
+  </script>
+</body>
+</html>
