@@ -22,7 +22,8 @@ echo
 ( sleep 1; open "$URL" ) &
 
 # 서버 실행 — 창이 열려 있는 동안 유지된다.
-python3 -m http.server "$PORT" >/dev/null 2>&1 || {
+# (기본 http.server 대신 Range 지원 서버. 큰 WACZ 재생에 Range가 필요하다.)
+python3 tools/serve.py "$PORT" >/dev/null 2>&1 || {
   echo
   echo "이미 다른 '보기' 창이 열려 있는 것 같습니다."
   echo "브라우저에서 ${URL} 를 직접 열어 보세요."

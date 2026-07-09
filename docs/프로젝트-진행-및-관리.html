@@ -211,6 +211,8 @@ python3 -m playwright install chromium</pre>
   <p>WACZ가 <strong>지금 manifest의 주소와 다른(옛/틀린) 주소로 캡처</strong>된 경우입니다. URL을 나중에 교정했지만 재캡처하지 않으면 이렇게 됩니다. 그 학생 status를 <code>recapture-needed</code>로 바꾸고 <code>캡처.command</code>를 다시 돌리면 교정된 주소로 새로 잡습니다.</p>
   <div class="sub">목록이 안 뜸 / "manifest.csv를 읽지 못했습니다"</div>
   <p><code>index.html</code>을 직접 연 경우입니다. <code>보기.command</code>로 다시 엽니다(로컬 서버가 필요).</p>
+  <div class="sub">"lack of range request support" (큰 작품 재생 실패)</div>
+  <p>큰 WACZ는 재생기가 파일을 통째로 안 받고 <strong>구간 요청(Range)</strong>으로 읽는데, 파이썬 기본 서버는 이를 지원하지 않습니다. <code>보기.command</code>는 Range를 지원하는 서버(<code>tools/serve.py</code>)를 쓰므로 이 오류가 안 납니다. 만약 이 오류가 보이면 <code>python3 -m http.server</code> 같은 기본 서버로 연 것이니, <strong>반드시 <code>보기.command</code></strong>로 여세요.</p>
   <div class="sub">URL 오타</div>
   <p>가장 흔합니다. 화면에서 옮길 때 한두 글자가 틀립니다. 캡처 전 브라우저로 실제 열어 정상 페이지인지 확인하면 빈 페이지 박제를 막을 수 있습니다.</p>
   <div class="sub">파일명에 공백·한글</div>
@@ -236,7 +238,8 @@ python3 -m playwright install chromium</pre>
 └─ tools/
    ├─ sync_manifest.py       구글 시트(접수) → manifest.csv
    ├─ crawl_manifest.py      대기분 선별 → 캡처
-   └─ capture_playwright.py  캡처 엔진 (Playwright→WARC→WACZ)</pre>
+   ├─ capture_playwright.py  캡처 엔진 (Playwright→WARC→WACZ)
+   └─ serve.py               보기용 로컬 서버 (Range 지원 — 큰 WACZ 재생)</pre>
 
   <div class="sub">8.2 매니페스트 컬럼</div>
   <p>왼쪽 = 사람이 편집하는 칸, 오른쪽 = 캡처가 자동으로 채우는 칸(건드리지 말 것).</p>
