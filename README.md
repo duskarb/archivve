@@ -77,9 +77,9 @@ python3 -m playwright install chromium
 
 ```text
 archivve/
-├── index.html      공개 목록 (manifest.csv를 읽음)
-├── admin.html      운영 현황 (대기·검수·비공개 포함 + 상태)
-├── viewer.html     재생 페이지
+├── index.html      목록/관리 현황 (Public list / All rows 모드)
+├── admin.html      예전 링크 호환용: index.html?mode=all 로 이동
+├── viewer.html     Archive 버튼을 눌렀을 때 열리는 재생 전용 페이지
 ├── manifest.csv    관리 원본 (모든 상태·결과가 여기 있음)
 ├── replay/         재생기 런타임 (replayweb.page, 벤더링됨)
 ├── wacz/<학기>/     아카이브 파일 (.wacz)

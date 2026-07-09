@@ -98,7 +98,7 @@
 
     .toolbar {
       display: grid;
-      grid-template-columns: minmax(180px, 1fr) minmax(150px, 220px) max-content;
+      grid-template-columns: minmax(180px, 1fr) minmax(150px, 220px) minmax(150px, 220px) max-content;
       gap: 0;
       align-items: center;
     }
@@ -159,7 +159,7 @@
     .list-head,
     .archive-row {
       display: grid;
-      grid-template-columns: 56px minmax(220px, 2fr) minmax(140px, 1fr) 120px minmax(220px, 1.2fr);
+      grid-template-columns: 56px minmax(220px, 2fr) minmax(140px, 1fr) 120px 130px minmax(220px, 1.2fr);
       gap: 12px;
       align-items: center;
     }
@@ -183,6 +183,16 @@
     .kind {
       color: var(--muted);
       text-transform: uppercase;
+    }
+
+    .state {
+      text-transform: uppercase;
+    }
+
+    .state.warn {
+      background: var(--mark);
+      padding: 2px 6px;
+      justify-self: start;
     }
 
     .actions {
@@ -247,18 +257,18 @@
 <body>
   <main class="shell">
     <nav class="topbar" aria-label="Archive">
-      <span>archivve</span>
+      <span>archivve list</span>
       <a id="sheet-link" href="#" target="_blank" rel="noopener">manifest sheet</a>
     </nav>
 
     <header class="masthead">
       <div>
         <h1>Class Web Archive</h1>
-        <p class="subtitle">같은 폴더의 manifest.csv를 읽어 만드는 아카이브 인덱스입니다. 새 학생 접수는 상단 manifest sheet(이름·수업·링크), 관리는 manifest.csv에서 합니다.</p>
+        <p class="subtitle">이 화면 하나에서 공개 목록과 관리 현황을 전환합니다. Archive 버튼을 누르면 viewer.html에서 보존본이 재생됩니다.</p>
       </div>
       <div class="summary" aria-live="polite">
-        <span id="item-count">0 works</span>
-        <span id="semester-count">0 semesters</span>
+        <span id="item-count">0 shown</span>
+        <span id="semester-count">0 public</span>
       </div>
     </header>
 
@@ -273,6 +283,13 @@
           <option value="">All</option>
         </select>
       </label>
+      <label>
+        <span>Mode:</span>
+        <select id="mode">
+          <option value="public">Public list</option>
+          <option value="all">All rows</option>
+        </select>
+      </label>
       <button id="reload" type="button">Reload</button>
     </section>
 
@@ -284,6 +301,7 @@
         <span>Work</span>
         <span>Student</span>
         <span>Semester</span>
+        <span>Status</span>
         <span>Links</span>
       </div>
       <div id="archive-list"></div>
@@ -305,18 +323,21 @@
       rows: [],
       query: "",
       semester: "",
+      mode: new URLSearchParams(location.search).get("mode") === "all" ? "all" : "public",
     };
 
     const list = document.getElementById("archive-list");
     const empty = document.getElementById("empty-state");
     const search = document.getElementById("search");
     const semester = document.getElementById("semester");
+    const mode = document.getElementById("mode");
     const reload = document.getElementById("reload");
     const statusLine = document.getElementById("status");
     const itemCount = document.getElementById("item-count");
     const semesterCount = document.getElementById("semester-count");
 
     document.getElementById("sheet-link").href = SHEET_EDIT_URL;
+    mode.value = state.mode;
 
     function clean(value) {
       return String(value || "").trim();
@@ -373,9 +394,18 @@
         });
     }
 
-    function isVisible(row) {
+    function isPublic(row) {
       const status = clean(row.status).toLowerCase();
       return status === "ok" || status === "partial";
+    }
+
+    function isVisible(row) {
+      return state.mode === "all" || isPublic(row);
+    }
+
+    function needsCapture(row) {
+      const status = clean(row.status).toLowerCase();
+      return status === "" || status === "pending" || status === "ready-to-capture" || status === "recapture-needed";
     }
 
     function slugify(value) {
@@ -403,7 +433,8 @@
     // 캡처가 안 된 행(대기)은 실제 파일이 없으므로 재생 버튼을 만들지 않는다.
     function archiveUrl(row) {
       const status = clean(row.status).toLowerCase();
-      if (!clean(row.wacz_file) || !["ok", "partial"].includes(status)) return "";
+      if (!clean(row.wacz_file)) return "";
+      if (state.mode !== "all" && !["ok", "partial"].includes(status)) return "";
       const source = `wacz/${clean(row.semester)}/${waczFile(row)}`;
       const params = new URLSearchParams({
         title: clean(row.title) || clean(row.original_url),
@@ -432,9 +463,10 @@
 
     function renderSummary() {
       const rows = state.rows.filter(isVisible);
-      const semesters = new Set(rows.map((row) => clean(row.semester)).filter(Boolean));
-      itemCount.textContent = `${rows.length} works`;
-      semesterCount.textContent = `${semesters.size} semesters`;
+      const publicRows = state.rows.filter(isPublic);
+      const needCapture = state.rows.filter(needsCapture);
+      itemCount.textContent = `${rows.length} shown`;
+      semesterCount.textContent = `${publicRows.length} public / ${needCapture.length} need capture`;
     }
 
     function renderSemesterOptions() {
@@ -493,6 +525,12 @@
         const term = document.createElement("span");
         term.textContent = clean(row.semester) || "-";
 
+        const rowState = clean(row.status).toLowerCase() || "pending";
+        const stateCell = document.createElement("span");
+        stateCell.className = "state";
+        stateCell.textContent = rowState;
+        if (!["ok", "partial"].includes(rowState)) stateCell.classList.add("warn");
+
         const actions = document.createElement("span");
         actions.className = "actions";
         const replay = archiveUrl(row);
@@ -506,7 +544,7 @@
           actions.appendChild(none);
         }
 
-        item.append(number, work, student, term, actions);
+        item.append(number, work, student, term, stateCell, actions);
         list.appendChild(item);
       });
     }
@@ -541,6 +579,16 @@
 
     semester.addEventListener("change", (event) => {
       state.semester = event.target.value;
+      renderRows();
+    });
+
+    mode.addEventListener("change", (event) => {
+      state.mode = event.target.value;
+      const next = new URL(location.href);
+      if (state.mode === "all") next.searchParams.set("mode", "all");
+      else next.searchParams.delete("mode");
+      history.replaceState(null, "", next);
+      renderSummary();
       renderRows();
     });
 
