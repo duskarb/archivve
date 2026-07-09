@@ -143,13 +143,6 @@ def view(args: argparse.Namespace) -> int:
     return run([sys.executable, "tools/serve.py", str(args.port), str(ROOT)], check=False).returncode
 
 
-def edit(_: argparse.Namespace) -> int:
-    editor = ROOT / "tools" / "manifest-editor.html"
-    webbrowser.open(editor.resolve().as_uri())
-    print(f"Opened {editor}")
-    return 0
-
-
 def doctor(_: argparse.Namespace) -> int:
     print(f"Python: {sys.executable}")
     print(f"Project: {ROOT}")
@@ -176,9 +169,6 @@ def main() -> int:
     view_parser.add_argument("--all", action="store_true", help="open the management/all rows mode")
     view_parser.add_argument("--port", type=int, default=8817)
     view_parser.set_defaults(func=view)
-
-    edit_parser = subparsers.add_parser("edit", help="open the local manifest CSV editor")
-    edit_parser.set_defaults(func=edit)
 
     doctor_parser = subparsers.add_parser("doctor", help="check local capture dependencies")
     doctor_parser.set_defaults(func=doctor)

@@ -12,7 +12,7 @@
 ## 역할 분담
 
 - **구글 시트 = 접수함.** 새 학생의 **이름·수업·링크**만 넣는 곳. 학생에게 직접 채우게 해도 된다.
-- **manifest.csv = 관리 원본.** 캡처 결과·상태·메모 등 모든 관리는 여기서 한다. 편집은 Numbers·Excel·텍스트, 또는 `tools/manifest-editor.html`로 한다.
+- **manifest.csv = 관리 원본.** 캡처 결과·상태·메모 등 모든 관리는 여기서 한다. 편집은 Numbers·Excel·텍스트 편집기로 한다.
 
 `python3 archive.py capture`가 시트의 **새 학생만** manifest.csv로 가져오고(pending으로 추가),
 이미 있는 학생의 관리 데이터는 절대 건드리지 않는다. 그래서 두 곳이 안 싸운다.
@@ -33,12 +33,14 @@
 이름만 적으면 된다. 폴더는 캡처할 때 자동으로 만들어진다.
 
 ### 2. 관리 (manifest.csv)
-상태·제목·메모 등 운영 관리는 `manifest.csv`에서 한다. Google Sheet는 접수함으로
-두고, `@보기`, `@캡쳐` 같은 자유 태그 대신 `status` 값을 명시적으로 쓴다.
+상태·제목·메모 등 운영 관리는 `manifest.csv`에서 한다. Numbers·Excel·텍스트 편집기로
+열어 고치면 된다. Google Sheet는 접수함으로 두고, `status` 값을 명시적으로 쓴다.
 
-로컬 폼이 편하면 `python3 archive.py edit`로 `tools/manifest-editor.html`을 열어 CSV를 불러온다.
-`Load CSV`로 열고, 기존 태그가 남아 있으면 `Convert @ Tags`로 상태값으로 바꾼 뒤
-`Download CSV`로 저장한다.
+편집 후 상태값·URL이 올바른지 확인하려면:
+
+```bash
+python3 tools/validate_manifest.py
+```
 
 ### 3. 캡처
 
