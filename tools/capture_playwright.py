@@ -260,6 +260,8 @@ def capture(seed_url: str, wacz_path: Path, page_limit: int = 30, depth: int = 3
             argv += ["--title", title]
         if description:
             argv += ["--desc", description]
+        if wacz_path.exists():  # 재캡처 시 기존 파일을 확실히 덮어쓴다
+            wacz_path.unlink()
         subprocess.run(argv, check=True, env={**os.environ})
 
     return wacz_path
