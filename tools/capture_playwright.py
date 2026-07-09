@@ -28,6 +28,55 @@ from warcio.warcwriter import WARCWriter
 # (Playwright의 body()는 압축이 풀린 바이트를 주므로 content-encoding/length를 버린다.)
 _SKIP_HEADERS = {"content-encoding", "content-length", "transfer-encoding", "connection"}
 
+# ── 이미지 최적화 설정 (환경변수로 조절 가능, ARCHIVE_OPTIMIZE=0 이면 끔) ──
+# 학생들이 최적화 안 한 큰 사진을 그대로 올리면 WACZ가 커진다. 캡처 시 큰 이미지를
+# 화면 크기 수준으로 다운스케일하고 재압축해 용량을 줄인다(원본보다 작을 때만 교체).
+_OPTIMIZE = os.environ.get("ARCHIVE_OPTIMIZE", "1") != "0"
+_OPT_MAX_DIM = int(os.environ.get("ARCHIVE_IMG_MAX_DIM", "2000"))   # 긴 변 최대 px
+_OPT_QUALITY = int(os.environ.get("ARCHIVE_IMG_QUALITY", "82"))     # JPEG 품질
+_OPT_MIN_BYTES = int(os.environ.get("ARCHIVE_IMG_MIN_BYTES", "300000"))  # 이 이하는 손대지 않음
+
+
+def _optimize_image(content_type: str, body: bytes) -> tuple[bytes, str]:
+    """큰 이미지를 다운스케일·재압축한다. 원본보다 작아질 때만 교체.
+    반환: (새 body, 새 content_type). Pillow가 없거나 처리 불가면 원본 그대로."""
+    if not _OPTIMIZE or len(body) < _OPT_MIN_BYTES:
+        return body, content_type
+    ct = (content_type or "").lower()
+    if "image/jpeg" not in ct and "image/png" not in ct:
+        return body, content_type
+    try:
+        from PIL import Image
+    except Exception:
+        return body, content_type
+    try:
+        im = Image.open(BytesIO(body))
+        im.load()
+    except Exception:
+        return body, content_type
+    if getattr(im, "is_animated", False):  # 애니메이션(APNG 등)은 건드리지 않는다
+        return body, content_type
+
+    width, height = im.size
+    if max(width, height) > _OPT_MAX_DIM:
+        scale = _OPT_MAX_DIM / max(width, height)
+        im = im.resize((max(1, int(width * scale)), max(1, int(height * scale))), Image.LANCZOS)
+
+    has_alpha = "a" in im.mode.lower() or (im.mode == "P" and "transparency" in im.info)
+    out = BytesIO()
+    if "png" in ct and has_alpha:
+        # 투명도가 있으면 PNG 유지(투명 손실 방지), 크기만 최적화.
+        im.save(out, format="PNG", optimize=True)
+        new_ct = "image/png"
+    else:
+        if im.mode not in ("RGB", "L"):
+            im = im.convert("RGB")
+        im.save(out, format="JPEG", quality=_OPT_QUALITY, optimize=True, progressive=True)
+        new_ct = "image/jpeg"
+
+    data = out.getvalue()
+    return (data, new_ct) if len(data) < len(body) else (body, content_type)
+
 # 스크롤로 지연 로딩 콘텐츠를 끌어낸 뒤 맨 위로 돌아온다.
 _AUTOSCROLL = """
 async () => {
@@ -55,11 +104,15 @@ def _in_scope(url: str, prefix: str) -> bool:
     return url.startswith(prefix)
 
 
-def _write_record(writer: WARCWriter, response, body: bytes) -> None:
+def _write_record(writer: WARCWriter, response, body: bytes, content_type: str) -> None:
     raw = response.request
     url = response.url
 
-    headers = [(k, v) for k, v in response.headers.items() if k.lower() not in _SKIP_HEADERS]
+    # content-type은 (최적화로 바뀔 수 있어) 직접 다시 설정한다.
+    skip = _SKIP_HEADERS | {"content-type"}
+    headers = [(k, v) for k, v in response.headers.items() if k.lower() not in skip]
+    if content_type:
+        headers.append(("Content-Type", content_type))
     headers.append(("Content-Length", str(len(body))))
     status_line = f"{response.status} {response.status_text or 'OK'}"
     http_headers = StatusAndHeaders(status_line, headers, protocol="HTTP/1.1")
@@ -87,6 +140,7 @@ def _capture_to_warc(seed_url: str, warc_path: Path, page_limit: int, depth: int
     pages: list[dict] = []
     queue: list[tuple[str, int]] = [(urldefrag(seed_url).url, 0)]
     written = 0
+    saved = 0
 
     with open(warc_path, "wb") as stream:
         writer = WARCWriter(stream, gzip=True)
@@ -139,8 +193,16 @@ def _capture_to_warc(seed_url: str, warc_path: Path, page_limit: int, depth: int
                         body = response.body()
                     except Exception:  # noqa: BLE001 (리다이렉트 등 본문 없음)
                         body = b""
+                    content_type = ""
+                    for key, value in response.headers.items():
+                        if key.lower() == "content-type":
+                            content_type = value
+                            break
+                    original_len = len(body)
+                    body, content_type = _optimize_image(content_type, body)
+                    saved += original_len - len(body)
                     try:
-                        _write_record(writer, response, body)
+                        _write_record(writer, response, body, content_type)
                         written += 1
                     except Exception as error:  # noqa: BLE001
                         print(f"    warn: {res_url} 기록 실패: {error}")
@@ -159,7 +221,7 @@ def _capture_to_warc(seed_url: str, warc_path: Path, page_limit: int, depth: int
 
             browser.close()
 
-    return written, pages
+    return written, pages, saved
 
 
 def _wacz_bin() -> str:
@@ -175,10 +237,11 @@ def capture(seed_url: str, wacz_path: Path, page_limit: int = 30, depth: int = 3
 
     with tempfile.TemporaryDirectory() as tmp:
         warc_path = Path(tmp) / "capture.warc.gz"
-        count, pages = _capture_to_warc(seed_url, warc_path, page_limit, depth)
+        count, pages, saved = _capture_to_warc(seed_url, warc_path, page_limit, depth)
         if count == 0:
             raise RuntimeError(f"{seed_url} 에서 기록된 응답이 없습니다.")
-        print(f"    {count}개 리소스, {len(pages)}개 페이지 기록 → WACZ 패키징")
+        saved_note = f", 이미지 최적화 {saved / 1024 / 1024:.1f}MB 절약" if saved > 0 else ""
+        print(f"    {count}개 리소스, {len(pages)}개 페이지 기록{saved_note} → WACZ 패키징")
 
         pages_path = Path(tmp) / "pages.jsonl"
         with pages_path.open("w", encoding="utf-8") as handle:

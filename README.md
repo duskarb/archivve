@@ -55,7 +55,7 @@
 캡처에는 파이썬 도구가 필요하다. 한 번만 설치한다:
 
 ```
-python3 -m pip install playwright warcio wacz
+python3 -m pip install playwright warcio wacz pillow
 python3 -m playwright install chromium
 ```
 

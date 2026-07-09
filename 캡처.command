@@ -8,7 +8,7 @@ echo "════════════════════════�
 echo
 
 # ── 1. 캡처 도구 확인 (처음이면 설치 제안) ─────────────────────
-if ! python3 -c "import playwright, warcio, wacz" 2>/dev/null; then
+if ! python3 -c "import playwright, warcio, wacz, PIL" 2>/dev/null; then
   echo "처음이시네요. 캡처에 필요한 도구를 먼저 설치해야 합니다."
   echo "(약 2~3분 걸리고 인터넷이 필요합니다.)"
   echo
@@ -19,13 +19,13 @@ if ! python3 -c "import playwright, warcio, wacz" 2>/dev/null; then
   fi
   echo
   echo "설치 중... (창을 닫지 마세요)"
-  if python3 -m pip install --quiet --upgrade playwright warcio wacz && python3 -m playwright install chromium; then
+  if python3 -m pip install --quiet --upgrade playwright warcio wacz pillow && python3 -m playwright install chromium; then
     echo "설치 완료!"
     echo
   else
     echo
     echo "자동 설치에 실패했습니다. 터미널에 아래 두 줄을 붙여넣어 직접 실행해 주세요:"
-    echo "    python3 -m pip install playwright warcio wacz"
+    echo "    python3 -m pip install playwright warcio wacz pillow"
     echo "    python3 -m playwright install chromium"
     echo
     read "?엔터를 누르면 창을 닫습니다."
