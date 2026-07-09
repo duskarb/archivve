@@ -28,7 +28,7 @@ SHEET_CSV_URL = f"https://docs.google.com/spreadsheets/d/{SHEET_ID}/gviz/tq?tqx=
 # manifest.csv가 없을 때 새로 만들 기본 컬럼 (편집 칸 왼쪽 / 기계 칸 오른쪽).
 DEFAULT_FIELDS = [
     "student_name", "semester", "title", "original_url", "status", "notes",
-    "drive_link", "wacz_file", "archived_date", "sha256",
+    "wacz_file", "archived_date", "sha256",
 ]
 
 # 시트가 접수함으로 채우는 값들. 헤더 이름이 조금 달라도 받아들이도록 별칭을 둔다.

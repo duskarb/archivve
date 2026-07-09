@@ -66,7 +66,7 @@ def main() -> None:
             semester = clean(row.get("semester"))
             status = clean(row.get("status")).lower()
             url = clean(row.get("original_url"))
-            wacz = clean(row.get("wacz_file")) or clean(row.get("wacz_url"))
+            wacz = clean(row.get("wacz_file"))
 
             label = f"line {number} ({name or title or 'untitled'})"
             if not name:
@@ -82,7 +82,7 @@ def main() -> None:
             if url and not valid_url(url):
                 errors.append(f"{label}: original_url must start with http:// or https://")
             if status in WACZ_EXPECTED_STATUSES and not wacz:
-                warnings.append(f"{label}: wacz_file or wacz_url is expected for status '{status}'")
+                warnings.append(f"{label}: wacz_file is expected for status '{status}'")
             if not status:
                 warnings.append(f"{label}: blank status is treated as pending")
 

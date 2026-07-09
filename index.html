@@ -180,11 +180,6 @@
       text-transform: uppercase;
     }
 
-    .kind {
-      color: var(--muted);
-      text-transform: uppercase;
-    }
-
     .state {
       text-transform: uppercase;
     }
@@ -450,7 +445,6 @@
       const haystack = [
         row.title,
         row.student_name,
-        row.type,
         row.semester,
         row.original_url,
         row.notes,
@@ -511,13 +505,6 @@
         const work = document.createElement("span");
         work.className = "work";
         work.textContent = clean(row.title) || "Untitled";
-        const kind = clean(row.type).toLowerCase();
-        if (kind && kind !== "work") {
-          const badge = document.createElement("span");
-          badge.className = "kind";
-          badge.textContent = ` · ${kind}`;
-          work.appendChild(badge);
-        }
 
         const student = document.createElement("span");
         student.textContent = clean(row.student_name) || "-";
@@ -536,7 +523,6 @@
         const replay = archiveUrl(row);
         if (replay) actions.appendChild(actionLink("Archive", replay));
         if (clean(row.original_url)) actions.appendChild(actionLink("Original", clean(row.original_url)));
-        if (clean(row.drive_link)) actions.appendChild(actionLink("Drive", clean(row.drive_link)));
         if (!actions.childElementCount) {
           const none = document.createElement("span");
           none.className = "none";
