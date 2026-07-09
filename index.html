@@ -39,8 +39,6 @@
     }
 
     .topbar,
-    .masthead,
-    .toolbar,
     .list-head,
     .archive-row {
       border-bottom: 1px solid var(--line);
@@ -54,53 +52,16 @@
       text-transform: uppercase;
     }
 
-    .topbar a {
-      text-decoration: none;
-    }
-
-    .topbar a:hover {
-      background: var(--mark);
-    }
-
-    .masthead {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) max-content;
-      gap: 20px;
-      padding: 16px 0 18px;
-    }
-
-    h1 {
-      margin: 0;
-      font-size: 14px;
-      font-weight: 400;
-      line-height: 1.35;
-      text-transform: uppercase;
-    }
-
-    .subtitle,
-    .summary,
     .status {
       color: var(--muted);
     }
 
-    .subtitle {
-      margin: 12px 0 0;
-      max-width: 620px;
-    }
-
-    .summary {
-      display: grid;
-      gap: 6px;
-      min-width: 160px;
-      text-align: right;
-      text-transform: uppercase;
-    }
-
     .toolbar {
-      display: grid;
-      grid-template-columns: minmax(180px, 1fr) minmax(150px, 220px) minmax(150px, 220px) max-content;
-      gap: 0;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
       align-items: center;
+      padding: 12px 0;
     }
 
     label {
@@ -109,18 +70,43 @@
       gap: 10px;
       align-items: center;
       min-height: 44px;
-      padding-right: 12px;
-      border-right: 1px solid var(--line);
       text-transform: uppercase;
     }
 
-    label:last-of-type {
-      border-right: 0;
+    .toolbar button {
+      min-height: 44px;
+      padding: 0;
+      border: 0;
+      background: none;
+      color: var(--text);
+      font: inherit;
+      text-transform: uppercase;
+      cursor: pointer;
+    }
+
+    .toolbar button:hover,
+    .toolbar button[aria-expanded="true"] {
+      text-decoration: underline;
+    }
+
+    .search-box {
+      display: flex;
+      align-items: center;
+      flex: 1 1 260px;
+      min-height: 44px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .search-box[hidden] {
+      display: none;
+    }
+
+    .semester-box {
+      margin-left: auto;
     }
 
     input,
-    select,
-    button {
+    select {
       font: inherit;
     }
 
@@ -128,25 +114,19 @@
       width: 100%;
       height: 36px;
       border: 0;
-      padding: 0 8px;
+      padding: 0;
+      background: none;
+    }
+
+    /* 검색칸은 밑줄이 영역 표시를 대신하므로 기본 포커스 링을 없앤다. */
+    input[type="search"]:focus {
+      outline: none;
     }
 
     select {
       max-width: 100%;
     }
 
-    button {
-      min-height: 44px;
-      border: 0;
-      border-left: 1px solid var(--line);
-      background: #fff;
-      color: var(--text);
-      padding: 0 12px;
-      cursor: pointer;
-      text-transform: uppercase;
-    }
-
-    button:hover,
     .archive-row:hover {
       background: var(--mark);
     }
@@ -159,9 +139,25 @@
     .list-head,
     .archive-row {
       display: grid;
-      grid-template-columns: 56px minmax(220px, 2fr) minmax(140px, 1fr) 120px 130px minmax(220px, 1.2fr);
+      grid-template-columns: minmax(220px, 2fr) minmax(140px, 1fr) 120px;
       gap: 12px;
       align-items: center;
+    }
+
+    /* 관리 화면(?mode=all, `archive.py view --all`)에서만 Status·Links 열이 보인다. */
+    body.manage .list-head,
+    body.manage .archive-row {
+      grid-template-columns: minmax(220px, 2fr) minmax(140px, 1fr) 120px 130px minmax(220px, 1.2fr);
+    }
+
+    .col-status,
+    .col-links {
+      display: none;
+    }
+
+    body.manage .col-status,
+    body.manage .col-links {
+      display: block;
     }
 
     .list-head {
@@ -173,6 +169,7 @@
       min-height: 54px;
       padding: 8px 0;
       border-color: var(--soft-line);
+      text-decoration: none;
     }
 
     .work {
@@ -193,20 +190,18 @@
     .actions {
       display: flex;
       flex-wrap: wrap;
-      gap: 8px;
+      gap: 14px;
     }
 
     .actions a {
-      border: 1px solid var(--line);
-      padding: 5px 10px;
-      text-decoration: none;
+      padding: 2px 0;
+      text-decoration: underline;
       text-transform: uppercase;
       white-space: nowrap;
     }
 
     .actions a:hover {
-      background: var(--text);
-      color: var(--bg);
+      background: var(--mark);
     }
 
     .actions .none {
@@ -220,27 +215,60 @@
       color: var(--muted);
     }
 
+    .pager {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 14px;
+      padding: 18px 0;
+    }
+
+    .pager[hidden] {
+      display: none;
+    }
+
+    .pager button {
+      padding: 2px 4px;
+      border: 0;
+      background: none;
+      color: var(--text);
+      font: inherit;
+      cursor: pointer;
+    }
+
+    .pager button:hover {
+      text-decoration: underline;
+    }
+
+    .pager button[aria-current="page"] {
+      text-decoration: underline;
+    }
+
+    .site-footer {
+      display: grid;
+      gap: 6px;
+      margin-top: 40px;
+      padding-top: 14px;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+    }
+
+    .site-footer p {
+      margin: 0;
+    }
+
+    .site-footer a:hover {
+      background: var(--mark);
+    }
+
     @media (max-width: 760px) {
-      .masthead,
-      .toolbar,
       .list-head,
       .archive-row {
         grid-template-columns: 1fr;
       }
 
-      .summary {
-        text-align: left;
-      }
-
-      label {
-        border-right: 0;
-        border-bottom: 1px solid var(--soft-line);
-        padding-right: 0;
-      }
-
-      button {
-        border-left: 0;
-        border-top: 1px solid var(--line);
+      .toolbar label {
+        flex: 1 1 100%;
       }
 
       .list-head {
@@ -252,87 +280,70 @@
 <body>
   <main class="shell">
     <nav class="topbar" aria-label="Archive">
-      <span>archivve list</span>
-      <a id="sheet-link" href="#" target="_blank" rel="noopener">manifest sheet</a>
+      <span>archivve</span>
     </nav>
 
-    <header class="masthead">
-      <div>
-        <h1>Class Web Archive</h1>
-        <p class="subtitle">이 화면 하나에서 공개 목록과 관리 현황을 전환합니다. Archive 버튼을 누르면 viewer.html에서 보존본이 재생됩니다.</p>
-      </div>
-      <div class="summary" aria-live="polite">
-        <span id="item-count">0 shown</span>
-        <span id="semester-count">0 public</span>
-      </div>
-    </header>
-
     <section class="toolbar" aria-label="Archive controls">
-      <label>
-        <span>Search:</span>
-        <input id="search" type="search" autocomplete="off">
-      </label>
-      <label>
+      <button id="search-toggle" type="button" aria-expanded="false" aria-controls="search-box">Search</button>
+      <span class="search-box" id="search-box" hidden>
+        <input id="search" type="search" autocomplete="off" aria-label="Search">
+      </span>
+      <label class="semester-box">
         <span>Semester:</span>
         <select id="semester">
           <option value="">All</option>
         </select>
       </label>
-      <label>
-        <span>Mode:</span>
-        <select id="mode">
-          <option value="public">Public list</option>
-          <option value="all">All rows</option>
-        </select>
-      </label>
-      <button id="reload" type="button">Reload</button>
     </section>
 
     <p class="status" id="status">manifest.csv를 읽는 중입니다.</p>
 
     <section aria-label="Archived works">
       <div class="list-head" aria-hidden="true">
-        <span>No.</span>
         <span>Work</span>
         <span>Student</span>
         <span>Semester</span>
-        <span>Status</span>
-        <span>Links</span>
+        <span class="col-status">Status</span>
+        <span class="col-links">Links</span>
       </div>
       <div id="archive-list"></div>
       <p class="empty" id="empty-state" hidden>표시할 항목이 없습니다.</p>
     </section>
+
+    <nav class="pager" id="pager" aria-label="Pages" hidden></nav>
+
+    <footer class="site-footer">
+      <p>수업에서 만든 학생 웹 작업물을 보존 당시 모습 그대로 저장하고 다시 재생하는 웹 아카이브입니다. <a href="https://visual-instruments.kaist.ac.kr" target="_blank" rel="noopener">시각도구 연구실</a>이 운영합니다.</p>
+      <p>A web archive that preserves student web works from our classes and replays them as they were. Maintained by the <a href="https://visual-instruments.kaist.ac.kr" target="_blank" rel="noopener">Visual Instruments Lab</a>, KAIST.</p>
+    </footer>
   </main>
 
   <script>
     // ── 설정 ──────────────────────────────────────────────────────────
     // 이 페이지는 같은 폴더의 로컬 manifest.csv만 읽어 목록을 만듭니다. 외부 의존 0.
-    // 명단 편집은 구글 시트에서 하고, 캡처 때 manifest.csv로 내려받습니다.
+    // 기본은 공개 목록(status가 ok/partial인 행만). `?mode=all`로 열면 전체 행과
+    // Status 열이 보이는 관리 화면이 된다 — `python3 archive.py view --all`이 이 주소를 연다.
     // 재생(viewer.html)은 서비스워커를 쓰므로 `python3 archive.py view`로 로컬 서버를 띄워 열어야 합니다.
     const VIEWER_URL = "viewer.html";
-    // 상단 "manifest sheet" 링크가 가리키는 편집용 구글 시트.
-    const SHEET_EDIT_URL = "https://docs.google.com/spreadsheets/d/1ttG_2q0ZKYopjJmkPUF9S3d3azgE8ymeFPboMheGVig/edit";
+    const PAGE_SIZE = 20;
     // ──────────────────────────────────────────────────────────────────
 
     const state = {
       rows: [],
       query: "",
       semester: "",
+      page: 1,
       mode: new URLSearchParams(location.search).get("mode") === "all" ? "all" : "public",
     };
 
     const list = document.getElementById("archive-list");
     const empty = document.getElementById("empty-state");
+    const pager = document.getElementById("pager");
     const search = document.getElementById("search");
     const semester = document.getElementById("semester");
-    const mode = document.getElementById("mode");
-    const reload = document.getElementById("reload");
     const statusLine = document.getElementById("status");
-    const itemCount = document.getElementById("item-count");
-    const semesterCount = document.getElementById("semester-count");
 
-    document.getElementById("sheet-link").href = SHEET_EDIT_URL;
-    mode.value = state.mode;
+    document.body.classList.toggle("manage", state.mode === "all");
 
     function clean(value) {
       return String(value || "").trim();
@@ -398,11 +409,6 @@
       return state.mode === "all" || isPublic(row);
     }
 
-    function needsCapture(row) {
-      const status = clean(row.status).toLowerCase();
-      return status === "" || status === "pending" || status === "recapture-needed";
-    }
-
     function slugify(value) {
       let out = "";
       for (const char of String(value).toLowerCase()) {
@@ -455,14 +461,6 @@
         (!q || haystack.includes(q));
     }
 
-    function renderSummary() {
-      const rows = state.rows.filter(isVisible);
-      const publicRows = state.rows.filter(isPublic);
-      const needCapture = state.rows.filter(needsCapture);
-      itemCount.textContent = `${rows.length} shown`;
-      semesterCount.textContent = `${publicRows.length} public / ${needCapture.length} need capture`;
-    }
-
     function renderSemesterOptions() {
       const current = semester.value;
       semester.innerHTML = '<option value="">All</option>';
@@ -490,17 +488,49 @@
       return link;
     }
 
+    function renderPager(pageCount) {
+      pager.innerHTML = "";
+      pager.hidden = pageCount <= 1;
+
+      for (let page = 1; page <= pageCount && pageCount > 1; page += 1) {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.textContent = String(page).padStart(2, "0");
+        if (page === state.page) button.setAttribute("aria-current", "page");
+        button.addEventListener("click", () => {
+          state.page = page;
+          renderRows();
+          window.scrollTo(0, 0);
+        });
+        pager.appendChild(button);
+      }
+    }
+
     function renderRows() {
       list.innerHTML = "";
       const rows = state.rows.filter(matches);
       empty.hidden = rows.length > 0;
 
-      rows.forEach((row, index) => {
-        const item = document.createElement("div");
-        item.className = "archive-row";
+      const pageCount = Math.max(1, Math.ceil(rows.length / PAGE_SIZE));
+      if (state.page > pageCount) state.page = pageCount;
+      const pageStart = (state.page - 1) * PAGE_SIZE;
+      renderPager(pageCount);
 
-        const number = document.createElement("span");
-        number.textContent = String(index + 1).padStart(2, "0");
+      rows.slice(pageStart, pageStart + PAGE_SIZE).forEach((row) => {
+        const replay = archiveUrl(row);
+
+        // 공개 화면에선 행 자체가 재생 링크다(별도 버튼 없음).
+        // 관리 화면에선 검수용 Archive/Original 버튼을 Links 열에 둔다.
+        let item;
+        if (state.mode !== "all" && replay) {
+          item = document.createElement("a");
+          item.href = replay;
+          item.target = "_blank";
+          item.rel = "noopener";
+        } else {
+          item = document.createElement("div");
+        }
+        item.className = "archive-row";
 
         const work = document.createElement("span");
         work.className = "work";
@@ -512,73 +542,86 @@
         const term = document.createElement("span");
         term.textContent = clean(row.semester) || "-";
 
-        const rowState = clean(row.status).toLowerCase() || "pending";
-        const stateCell = document.createElement("span");
-        stateCell.className = "state";
-        stateCell.textContent = rowState;
-        if (!["ok", "partial"].includes(rowState)) stateCell.classList.add("warn");
+        item.append(work, student, term);
 
-        const actions = document.createElement("span");
-        actions.className = "actions";
-        const replay = archiveUrl(row);
-        if (replay) actions.appendChild(actionLink("Archive", replay));
-        if (clean(row.original_url)) actions.appendChild(actionLink("Original", clean(row.original_url)));
-        if (!actions.childElementCount) {
-          const none = document.createElement("span");
-          none.className = "none";
-          none.textContent = clean(row.status) || "pending";
-          actions.appendChild(none);
+        if (state.mode === "all") {
+          const rowState = clean(row.status).toLowerCase() || "pending";
+          const stateCell = document.createElement("span");
+          stateCell.className = "state";
+          stateCell.textContent = rowState;
+          if (!["ok", "partial"].includes(rowState)) stateCell.classList.add("warn");
+
+          const actions = document.createElement("span");
+          actions.className = "actions";
+          if (replay) actions.appendChild(actionLink("Archive", replay));
+          if (clean(row.original_url)) actions.appendChild(actionLink("Original", clean(row.original_url)));
+          if (!actions.childElementCount) {
+            const none = document.createElement("span");
+            none.className = "none";
+            none.textContent = "-";
+            actions.appendChild(none);
+          }
+
+          item.append(stateCell, actions);
         }
 
-        item.append(number, work, student, term, stateCell, actions);
         list.appendChild(item);
       });
     }
 
-    function setRows(rows, sourceLabel) {
+    function setRows(rows) {
       state.rows = rows;
-      renderSummary();
       renderSemesterOptions();
       renderRows();
-      statusLine.textContent = `${sourceLabel}에서 ${rows.length}개 항목을 읽었습니다.`;
+      statusLine.hidden = true;
     }
 
     // 같은 폴더의 로컬 manifest.csv만 읽는다. (localhost로 서빙되면 fetch가 동작한다)
     function loadManifest() {
-      statusLine.textContent = "manifest.csv를 읽는 중입니다.";
+      statusLine.hidden = false;
+      statusLine.textContent = "목록을 불러오는 중입니다.";
       fetch("manifest.csv", { cache: "no-store" })
         .then((response) => {
           if (!response.ok) throw new Error("manifest.csv");
           return response.text();
         })
-        .then((text) => setRows(parseCsv(text), "manifest.csv"))
+        .then((text) => setRows(parseCsv(text)))
         .catch(() => {
-          setRows([], "manifest.csv");
-          statusLine.textContent = "manifest.csv를 읽지 못했습니다. index.html을 직접 열지 말고 `python3 archive.py view`로 실행해 주세요.";
+          setRows([]);
+          statusLine.hidden = false;
+          statusLine.textContent = "목록을 읽지 못했습니다. index.html을 직접 열지 말고 `python3 archive.py view`로 실행해 주세요.";
         });
     }
 
+    const searchToggle = document.getElementById("search-toggle");
+    const searchBox = document.getElementById("search-box");
+
+    searchToggle.addEventListener("click", () => {
+      const opening = searchBox.hidden;
+      searchBox.hidden = !opening;
+      searchToggle.setAttribute("aria-expanded", String(opening));
+      if (opening) {
+        search.focus();
+      } else if (state.query) {
+        // 검색바를 닫으면 숨은 필터가 남지 않게 검색어도 지운다.
+        search.value = "";
+        state.query = "";
+        state.page = 1;
+        renderRows();
+      }
+    });
+
     search.addEventListener("input", (event) => {
       state.query = event.target.value;
+      state.page = 1;
       renderRows();
     });
 
     semester.addEventListener("change", (event) => {
       state.semester = event.target.value;
+      state.page = 1;
       renderRows();
     });
-
-    mode.addEventListener("change", (event) => {
-      state.mode = event.target.value;
-      const next = new URL(location.href);
-      if (state.mode === "all") next.searchParams.set("mode", "all");
-      else next.searchParams.delete("mode");
-      history.replaceState(null, "", next);
-      renderSummary();
-      renderRows();
-    });
-
-    reload.addEventListener("click", loadManifest);
 
     loadManifest();
   </script>
