@@ -14,7 +14,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-# 편집 칸(왼쪽) + 기계가 채우는 칸(오른쪽). type·wacz_url은 쓰지 않는다.
+# 편집 칸(왼쪽) + 기계가 채우는 칸(오른쪽).
 DEFAULT_FIELDS = [
     "student_name",
     "semester",
@@ -22,7 +22,6 @@ DEFAULT_FIELDS = [
     "original_url",
     "status",
     "notes",
-    "drive_link",
     "wacz_file",
     "archived_date",
     "sha256",
