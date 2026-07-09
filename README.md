@@ -62,8 +62,8 @@ python3 archive.py capture --install
 
 ### 4. 보기
 
-로컬 서버를 띄우고 브라우저로 아카이브 목록을 연다. 각 항목의 **Archive** 버튼을
-누르면 보존된 사이트가 그대로 재생된다.
+로컬 서버를 띄우고 브라우저로 아카이브 목록을 연다. 목록의 **행을 클릭하면**
+보존된 사이트가 그대로 재생된다.
 
 ```bash
 python3 archive.py view
@@ -74,6 +74,10 @@ python3 archive.py view
 ```bash
 python3 archive.py view --all
 ```
+
+관리 화면(`--all`)에서만 전체 행과 `status` 열, 원본(Original) 링크가 보인다.
+`review-needed` 캡처를 재생해 검수하는 것도 이 화면에서 한다. 기본 화면과
+공개 주소에는 공개(`ok`/`partial`) 작품 목록만 나온다.
 
 > `index.html`을 직접 더블클릭하지 말 것. 재생(WACZ)이 서비스워커를 쓰기 때문에
 > 반드시 `python3 archive.py view`로 로컬 서버를 통해 열어야 재생된다.
@@ -120,7 +124,7 @@ python3 archive.py doctor
 
 ```text
 archivve/
-├── index.html      목록/관리 현황 (Public list / All rows 모드)
+├── index.html      공개 목록 (`?mode=all`로 열면 관리 화면)
 ├── viewer.html     Archive 버튼을 눌렀을 때 열리는 재생 전용 페이지
 ├── manifest.csv    관리 원본 (모든 상태·결과가 여기 있음)
 ├── replay/         재생기 런타임 (replayweb.page, 벤더링됨)
