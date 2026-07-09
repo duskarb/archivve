@@ -236,21 +236,21 @@ python3 -m playwright install chromium</pre>
    └─ capture_playwright.py  캡처 엔진 (Playwright→WARC→WACZ)</pre>
 
   <div class="sub">8.2 매니페스트 컬럼</div>
+  <p>왼쪽 = 사람이 편집하는 칸, 오른쪽 = 캡처가 자동으로 채우는 칸(건드리지 말 것).</p>
   <table>
     <tr><th>컬럼</th><th>채우는 주체</th><th>설명</th></tr>
     <tr><td>student_name</td><td>사람(접수)</td><td>학생 이름</td></tr>
-    <tr><td>title</td><td>사람</td><td>작품 제목</td></tr>
-    <tr><td>type</td><td>사람(선택)</td><td>work / lesson / material 등 분류</td></tr>
-    <tr><td>original_url</td><td>사람(접수)</td><td>원본 사이트 주소 (공개·로그인 불필요)</td></tr>
-    <tr><td>drive_link</td><td>사람(선택)</td><td>구글 드라이브 자료 링크 → 목록에 Drive 버튼</td></tr>
     <tr><td>semester</td><td>사람(접수)</td><td>학기 태그 (예: 2026-spring). 폴더 이름이 됨</td></tr>
+    <tr><td>title</td><td>사람</td><td>작품 제목</td></tr>
+    <tr><td>original_url</td><td>사람(접수)</td><td>원본 사이트 주소 (공개·로그인 불필요)</td></tr>
+    <tr><td>status</td><td>사람</td><td>ok / pending / recapture-needed / private</td></tr>
+    <tr><td>notes</td><td>사람</td><td>비고 (교정 이력·주의사항 등)</td></tr>
+    <tr><td>drive_link</td><td>사람(선택)</td><td>구글 드라이브 자료 링크 → 목록에 Drive 버튼</td></tr>
     <tr><td>wacz_file</td><td>캡처 자동</td><td>캡처 결과 파일명 (<code>slug(이름)-slug(학기).wacz</code>)</td></tr>
     <tr><td>archived_date</td><td>캡처 자동</td><td>캡처 날짜</td></tr>
     <tr><td>sha256</td><td>캡처 자동</td><td>무결성 점검용 해시</td></tr>
-    <tr><td>status</td><td>사람/자동</td><td>ok / pending / recapture-needed / private</td></tr>
-    <tr><td>notes</td><td>사람</td><td>비고 (교정 이력·주의사항 등)</td></tr>
   </table>
-  <p>참고: <code>wacz_url</code> 컬럼이 있어도 목록 페이지는 무시하고 항상 로컬 상대경로 <code>wacz/&lt;학기&gt;/&lt;파일&gt;</code>로 재생하므로, 저장 위치가 바뀌어도 손댈 것이 없습니다.</p>
+  <p>실제로 손댈 칸은 왼쪽 6~7개뿐입니다. 오른쪽 3개는 캡처가 알아서 채웁니다. (안 쓰던 <code>type</code>·<code>wacz_url</code> 칸은 없앴습니다.)</p>
 
   <div class="footer rule-thin"></div>
   <p class="footer">이 시스템의 미덕은 단순함입니다. 표준 포맷(WACZ) + 서버 없는 재생 + 텍스트 매니페스트 + 자족적 폴더 — 네 가지 모두 "10~20년 뒤에도 그대로 열린다"에 베팅한 선택입니다. 복잡한 것이 없으므로 고장 날 것도, 매년 손볼 것도 거의 없습니다.</p>

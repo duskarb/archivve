@@ -25,10 +25,10 @@ ROOT = Path(__file__).resolve().parents[1]
 SHEET_ID = "1ttG_2q0ZKYopjJmkPUF9S3d3azgE8ymeFPboMheGVig"
 SHEET_CSV_URL = f"https://docs.google.com/spreadsheets/d/{SHEET_ID}/gviz/tq?tqx=out:csv"
 
-# manifest.csv가 없을 때 새로 만들 기본 컬럼.
+# manifest.csv가 없을 때 새로 만들 기본 컬럼 (편집 칸 왼쪽 / 기계 칸 오른쪽).
 DEFAULT_FIELDS = [
-    "student_name", "title", "type", "original_url", "drive_link", "semester",
-    "wacz_file", "wacz_url", "archived_date", "sha256", "status", "notes",
+    "student_name", "semester", "title", "original_url", "status", "notes",
+    "drive_link", "wacz_file", "archived_date", "sha256",
 ]
 
 # 시트가 접수함으로 채우는 값들. 헤더 이름이 조금 달라도 받아들이도록 별칭을 둔다.
@@ -56,13 +56,11 @@ def slug(value: str) -> str:
 
 
 def row_key(row: dict[str, str]) -> str:
-    """학생을 식별하는 키. 캡처 전/후 모두 같은 값이 나오도록 wacz_file 우선."""
-    wacz_file = clean(row.get("wacz_file"))
-    if wacz_file:
-        return wacz_file
+    """학생 식별 키 = 이름+학기. wacz_file 철자가 이름과 달라도 중복이 안 생기게
+    항상 이름+학기로 맞춘다. (예전엔 wacz_file을 먼저 써서 철자 차이로 중복이 생겼음)"""
     base = clean(row.get("student_name")) or clean(row.get("title"))
     semester = clean(row.get("semester")) or "undated"
-    return f"{slug(base)}-{slug(semester)}.wacz"
+    return f"{slug(base)}-{slug(semester)}"
 
 
 def read_rows(text: str) -> tuple[list[str], list[dict[str, str]]]:
