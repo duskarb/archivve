@@ -150,7 +150,7 @@
 
   <div class="sub">5.1 역할 분담 — 시트는 접수, CSV는 관리</div>
   <p><strong>구글 시트 = 접수함.</strong> 새 학생의 <strong>이름·수업(semester)·링크(original_url)</strong>만 넣습니다(학생이 직접 채우게 해도 됩니다). <strong><code>manifest.csv</code> = 관리 원본.</strong> 캡처 결과·상태·메모 등 모든 관리는 여기서 합니다(Numbers·Excel·텍스트로 편집).</p>
-  <p><code>캡처.command</code>가 시트의 <strong>새 학생만</strong> <code>manifest.csv</code>로 가져와 <code>pending</code>으로 넣습니다. 이미 있는 학생의 관리 데이터는 절대 건드리지 않으므로 두 곳이 어긋나지 않습니다. <strong>주의:</strong> 캡처 결과는 시트로 되돌아 쓰이지 않습니다 — 시트에서 상태·파일명 칸이 비어 보이는 것은 정상이며, 관리 현황은 <code>admin.html</code>에서 봅니다.</p>
+  <p><code>캡처.command</code>가 시트의 <strong>새 학생만</strong> <code>manifest.csv</code>로 가져와 <code>pending</code>으로 넣습니다. 이미 있는 학생의 관리 데이터는 절대 건드리지 않으므로 두 곳이 어긋나지 않습니다. <strong>주의:</strong> 캡처 결과는 시트로 되돌아 쓰이지 않습니다 — 시트에서 상태·파일명 칸이 비어 보이는 것은 정상이며, 관리 현황은 <code>index.html</code>의 <strong>All rows</strong> 모드에서 봅니다.</p>
 
   <div class="sub">5.2 평소 3단계</div>
   <ol>
@@ -206,7 +206,7 @@ python3 -m playwright install chromium</pre>
 
   <div class="section-label">7. 자주 생기는 문제와 대응</div>
   <div class="sub">Archive를 눌렀는데 빈 화면</div>
-  <p>해당 WACZ가 <code>wacz/&lt;학기&gt;/</code>에 없거나(캡처 전), 파일명이 규칙과 안 맞는 경우입니다. <code>admin.html</code>에서 상태·캡처일을 확인하고, 없으면 그 학생을 다시 캡처합니다.</p>
+  <p>해당 WACZ가 <code>wacz/&lt;학기&gt;/</code>에 없거나(캡처 전), 파일명이 규칙과 안 맞는 경우입니다. <code>index.html</code>의 <strong>All rows</strong> 모드에서 상태·캡처일을 확인하고, 없으면 그 학생을 다시 캡처합니다.</p>
   <div class="sub">"Archived Page Not Found" (재생 화면 안에)</div>
   <p>WACZ가 <strong>지금 manifest의 주소와 다른(옛/틀린) 주소로 캡처</strong>된 경우입니다. URL을 나중에 교정했지만 재캡처하지 않으면 이렇게 됩니다. 그 학생 status를 <code>recapture-needed</code>로 바꾸고 <code>캡처.command</code>를 다시 돌리면 교정된 주소로 새로 잡습니다.</p>
   <div class="sub">목록이 안 뜸 / "manifest.csv를 읽지 못했습니다"</div>
@@ -227,8 +227,7 @@ python3 -m playwright install chromium</pre>
   <div class="section-label">8. 부록</div>
   <div class="sub">8.1 폴더 구조</div>
 <pre>archivve/
-├─ index.html        공개 목록 (manifest.csv를 직접 읽음)
-├─ admin.html        운영 현황 (대기·비공개 포함 + 상태)
+├─ index.html        목록/관리 현황 (Public list / All rows 모드)
 ├─ viewer.html       개별 작품 재생 페이지
 ├─ manifest.csv      관리 원본 (모든 상태·결과)
 ├─ replay/           replayweb.page (버전 고정, 자가호스팅)
