@@ -17,7 +17,7 @@
 `python3 archive.py capture`가 시트의 **새 학생만** manifest.csv로 가져오고(pending으로 추가),
 이미 있는 학생의 관리 데이터는 절대 건드리지 않는다. 그래서 두 곳이 안 싸운다.
 
-## 평소 사용법 — 3단계
+## 평소 사용법 — 5단계
 
 ### 1. 접수 (구글 시트)
 [manifest 시트](https://docs.google.com/spreadsheets/d/1ttG_2q0ZKYopjJmkPUF9S3d3azgE8ymeFPboMheGVig/edit)에
@@ -78,6 +78,23 @@ python3 archive.py view --all
 > `index.html`을 직접 더블클릭하지 말 것. 재생(WACZ)이 서비스워커를 쓰기 때문에
 > 반드시 `python3 archive.py view`로 로컬 서버를 통해 열어야 재생된다.
 
+### 5. 공개 (GitHub Pages)
+
+이 폴더는 GitHub 저장소이기도 하다. `main` 브랜치에 올리면(push) 몇 분 안에
+공개 주소 <https://duskarb.github.io/archivve/> 에 반영된다. 캡처·검수가 끝나면:
+
+```bash
+git add -A
+git commit -m "2027-spring capture"
+git push
+```
+
+터미널이 익숙하지 않으면 [GitHub Desktop](https://desktop.github.com) 앱에서
+같은 작업을 클릭 두 번(Commit → Push)으로 할 수 있다.
+
+> push 전까지는 어떤 변경도 공개되지 않는다. 로컬에서 `python3 archive.py view`로
+> 먼저 확인한 뒤 올리면 된다.
+
 ---
 
 ## 최초 1회 준비 (캡처하는 컴퓨터에서만)
@@ -124,17 +141,16 @@ archivve/
 
 | status | 의미 | 공개 목록 |
 |---|---|---|
-| `pending` | URL 대기 또는 아직 캡처 전 | 숨김 |
-| `ready-to-capture` | URL 있음, 다음 캡처 대상 | 숨김 |
+| `pending` | 아직 캡처 전 (다음 캡처 대상) | 숨김 |
 | `review-needed` | 캡처 완료, 사람이 재생 확인 필요 | 숨김 |
 | `ok` | 검수 완료 | 공개 |
 | `partial` | 일부 누락 있지만 공개 가능 | 공개 |
 | `recapture-needed` | 다시 캡처 필요 | 숨김 |
-| `private` / `hidden` | 비공개 | 숨김 |
+| `hidden` | 비공개 (캡처도 건너뜀) | 숨김 |
 
 빈 status는 `pending`과 동일하게 취급한다. `python3 archive.py capture`는 빈 값, `pending`,
-`ready-to-capture`, `recapture-needed`를 캡처 대상으로 본다. 캡처가 끝나면
-`review-needed`가 되며, 사람이 재생을 확인한 뒤 `ok` 또는 `partial`로 바꾼다.
+`recapture-needed`를 캡처 대상으로 본다. 캡처가 끝나면 `review-needed`가 되며,
+사람이 재생을 확인한 뒤 `ok` 또는 `partial`로 바꾼다.
 
 ## 참고
 

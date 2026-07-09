@@ -68,7 +68,7 @@ def capture_targets() -> list[str]:
         for row in csv.DictReader(handle):
             status = (row.get("status") or "").strip().lower()
             url = (row.get("original_url") or "").strip()
-            if url and status in {"", "pending", "ready-to-capture", "recapture-needed"}:
+            if url and status in {"", "pending", "recapture-needed"}:
                 targets.append((row.get("student_name") or row.get("title") or "Untitled").strip())
     return targets
 
