@@ -79,7 +79,7 @@
 
   <div class="doc-title">KAIST 디자인 스튜디오 I — 학생 웹 작업물 아카이브</div>
   <div class="meta">진행 및 관리 문서 (Project Log &amp; Operations Handbook)</div>
-  <div class="meta">최종 갱신: 2026-07-07 · 대상 학기: 2026-spring</div>
+  <div class="meta">최종 갱신: 2026-07-09 · 대상 학기: 2026-spring</div>
 
   <hr>
 
@@ -155,7 +155,7 @@
   <div class="sub">5.2 평소 3단계</div>
   <ol>
     <li><strong>접수(구글 시트)</strong> — 새 학생을 이름·수업·링크로 한 줄 추가.</li>
-    <li><strong>캡처(<code>캡처.command</code> 더블클릭)</strong> — 시트의 새 학생을 가져오고, 대기 중인 사이트를 캡처해 <code>wacz/&lt;학기&gt;/</code>에 저장. 대상은 실행 중 물어봅니다(이름 필터를 비우면 대기 전체).</li>
+    <li><strong>캡처(<code>캡처.command</code> 더블클릭)</strong> — 시트의 새 학생을 가져온 뒤 <strong>캡처할 작품 목록을 보여주고, 엔터 한 번</strong>이면 대기 중인 작품을 <code>wacz/&lt;학기&gt;/</code>에 저장. (처음 실행 시 캡처 도구 설치를 물어보고 자동으로 깔아줍니다. 특정 학생만 다시 캡처하려면 manifest.csv에서 그 학생 status를 <code>recapture-needed</code>로.)</li>
     <li><strong>보기(<code>보기.command</code> 더블클릭)</strong> — 로컬 서버를 띄우고 브라우저로 목록·재생을 확인.</li>
   </ol>
   <p class="note-box"><code>index.html</code>을 직접 더블클릭하면 재생이 안 됩니다. WACZ 재생은 서비스워커를 쓰는데 이는 파일 직접 열기(<code>file://</code>)에서 동작하지 않으므로, 반드시 <code>보기.command</code>로 로컬 서버를 통해 엽니다. macOS 내장 파이썬만 있으면 되므로 보기에는 별도 설치가 필요 없습니다.</p>
@@ -194,18 +194,21 @@ python3 -m playwright install chromium</pre>
 
   <div class="section-label">6. 현재 상태 요약 (2026-spring)</div>
   <div class="note-box">
-    전체 37명 · 캡처 완료(로컬 재생 가능) 36 · 링크 대기 1 (Seungyun Lee) — 2026-07-07 전 학생 로컬 캡처 완료
+    전체 35명 · 캡처 완료(로컬 재생 가능) 34 · 링크 대기 1 (Seungyun Lee) — 2026-07-09 전 학생 로컬 캡처 완료
   </div>
   <p>남은 일 / 참고:</p>
   <ul>
     <li><strong>링크 대기 1명</strong> — Seungyun Lee. 학생에게 주소만 받아 시트에 넣고 <code>캡처.command</code>를 돌리면 됩니다.</li>
     <li><strong>Seoyun Oh</strong> — 원본 페이지 자체가 거의 비어 있습니다(placeholder 텍스트 + 2바이트짜리 깨진 이미지). 캡처는 정상이며, 학생 페이지가 완성되면 다시 캡처하면 됩니다.</li>
     <li><strong>Kincso(Whimsical Bridge)</strong> — 24MB로 캡처됐고 파일은 유효하지만, 무거운 페이지라 재생에 시간이 더 걸립니다. <code>보기.command</code>에서 실제로 열어 확인하고, 안 뜨면 재캡처합니다.</li>
+    <li><strong>정리 이력</strong> — 철자 다른 파일명으로 중복 접수됐던 2명(Myeonghyeon Choi·Hyunjoon Jeong)을 병합해 37→35명이 됐습니다. URL 오타로 옛 WACZ가 틀린 사이트를 담고 있던 6명은 교정 주소로 재캡처 완료.</li>
   </ul>
 
   <div class="section-label">7. 자주 생기는 문제와 대응</div>
   <div class="sub">Archive를 눌렀는데 빈 화면</div>
   <p>해당 WACZ가 <code>wacz/&lt;학기&gt;/</code>에 없거나(캡처 전), 파일명이 규칙과 안 맞는 경우입니다. <code>admin.html</code>에서 상태·캡처일을 확인하고, 없으면 그 학생을 다시 캡처합니다.</p>
+  <div class="sub">"Archived Page Not Found" (재생 화면 안에)</div>
+  <p>WACZ가 <strong>지금 manifest의 주소와 다른(옛/틀린) 주소로 캡처</strong>된 경우입니다. URL을 나중에 교정했지만 재캡처하지 않으면 이렇게 됩니다. 그 학생 status를 <code>recapture-needed</code>로 바꾸고 <code>캡처.command</code>를 다시 돌리면 교정된 주소로 새로 잡습니다.</p>
   <div class="sub">목록이 안 뜸 / "manifest.csv를 읽지 못했습니다"</div>
   <p><code>index.html</code>을 직접 연 경우입니다. <code>보기.command</code>로 다시 엽니다(로컬 서버가 필요).</p>
   <div class="sub">URL 오타</div>
