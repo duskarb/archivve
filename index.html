@@ -312,8 +312,8 @@
   <script>
     // ── 설정 ──────────────────────────────────────────────────────────
     // 이 페이지는 같은 폴더의 로컬 manifest.csv만 읽어 목록을 만듭니다. 외부 의존 0.
-    // 명단 편집은 구글 시트에서 하고, 캡처(캡처.command) 때 manifest.csv로 내려받습니다.
-    // 재생(viewer.html)은 서비스워커를 쓰므로 보기.command로 로컬 서버를 띄워 열어야 합니다.
+    // 명단 편집은 구글 시트에서 하고, 캡처 때 manifest.csv로 내려받습니다.
+    // 재생(viewer.html)은 서비스워커를 쓰므로 `python3 archive.py view`로 로컬 서버를 띄워 열어야 합니다.
     const VIEWER_URL = "viewer.html";
     // 상단 "manifest sheet" 링크가 가리키는 편집용 구글 시트.
     const SHEET_EDIT_URL = "https://docs.google.com/spreadsheets/d/1ttG_2q0ZKYopjJmkPUF9S3d3azgE8ymeFPboMheGVig/edit";
@@ -568,7 +568,7 @@
         .then((text) => setRows(parseCsv(text), "manifest.csv"))
         .catch(() => {
           setRows([], "manifest.csv");
-          statusLine.textContent = "manifest.csv를 읽지 못했습니다. index.html을 직접 열지 말고 보기.command로 실행해 주세요.";
+          statusLine.textContent = "manifest.csv를 읽지 못했습니다. index.html을 직접 열지 말고 `python3 archive.py view`로 실행해 주세요.";
         });
     }
 

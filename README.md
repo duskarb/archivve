@@ -14,7 +14,7 @@
 - **구글 시트 = 접수함.** 새 학생의 **이름·수업·링크**만 넣는 곳. 학생에게 직접 채우게 해도 된다.
 - **manifest.csv = 관리 원본.** 캡처 결과·상태·메모 등 모든 관리는 여기서 한다. 편집은 Numbers·Excel·텍스트, 또는 `tools/manifest-editor.html`로 한다.
 
-`캡처.command`가 시트의 **새 학생만** manifest.csv로 가져오고(pending으로 추가),
+`python3 archive.py capture`가 시트의 **새 학생만** manifest.csv로 가져오고(pending으로 추가),
 이미 있는 학생의 관리 데이터는 절대 건드리지 않는다. 그래서 두 곳이 안 싸운다.
 
 ## 평소 사용법 — 3단계
@@ -36,28 +36,49 @@
 상태·제목·메모 등 운영 관리는 `manifest.csv`에서 한다. Google Sheet는 접수함으로
 두고, `@보기`, `@캡쳐` 같은 자유 태그 대신 `status` 값을 명시적으로 쓴다.
 
-로컬 폼이 편하면 브라우저에서 `tools/manifest-editor.html`을 열어 CSV를 불러온다.
+로컬 폼이 편하면 `python3 archive.py edit`로 `tools/manifest-editor.html`을 열어 CSV를 불러온다.
 `Load CSV`로 열고, 기존 태그가 남아 있으면 `Convert @ Tags`로 상태값으로 바꾼 뒤
 `Download CSV`로 저장한다.
 
-### 3. 캡처 (`캡처.command` 더블클릭)
+### 3. 캡처
+
 시트에서 새 학생을 가져온 뒤, **캡처할 작품 목록을 보여주고 엔터 한 번**이면
 캡처 대상 작품을 `wacz/<학기>/`에 저장한다. Docker도, 로그인도, 토큰도 필요 없다.
-처음 실행 시 캡처 도구 설치를 물어보고 자동으로 깔아준다.
+
+```bash
+python3 archive.py capture
+```
+
+처음 실행 시 캡처 도구 설치를 물어본다. 바로 설치까지 진행하려면:
+
+```bash
+python3 archive.py capture --install
+```
 
 > 특정 학생을 다시 캡처하려면 `manifest.csv`에서 그 학생 `status`를
 > `recapture-needed`로 바꾸고 다시 실행하면 된다.
 
-### 4. 보기 (`보기.command` 더블클릭)
+### 4. 보기
+
 로컬 서버를 띄우고 브라우저로 아카이브 목록을 연다. 각 항목의 **Archive** 버튼을
 누르면 보존된 사이트가 그대로 재생된다.
 
+```bash
+python3 archive.py view
+```
+
+관리 현황까지 보려면:
+
+```bash
+python3 archive.py view --all
+```
+
 > `index.html`을 직접 더블클릭하지 말 것. 재생(WACZ)이 서비스워커를 쓰기 때문에
-> 반드시 `보기.command`로 로컬 서버를 통해 열어야 재생된다.
+> 반드시 `python3 archive.py view`로 로컬 서버를 통해 열어야 재생된다.
 
 ---
 
-## 최초 1회 준비 (캡처하는 Mac에서만)
+## 최초 1회 준비 (캡처하는 컴퓨터에서만)
 
 캡처에는 파이썬 도구가 필요하다. 한 번만 설치한다:
 
@@ -66,10 +87,13 @@ python3 -m pip install playwright warcio wacz pillow
 python3 -m playwright install chromium
 ```
 
-*보기*는 macOS에 기본 내장된 python만 있으면 되므로 추가 설치가 필요 없다.
+*보기*는 Python 표준 라이브러리만 쓰므로 별도 설치가 필요 없다.
 
-처음 `.command` 파일을 더블클릭하면 "확인되지 않은 개발자" 경고가 뜰 수 있다.
-그럴 땐 파일을 **우클릭 → 열기**를 한 번만 하면 이후로는 그냥 더블클릭된다.
+설치 상태를 확인하려면:
+
+```bash
+python3 archive.py doctor
+```
 
 ---
 
@@ -82,8 +106,7 @@ archivve/
 ├── manifest.csv    관리 원본 (모든 상태·결과가 여기 있음)
 ├── replay/         재생기 런타임 (replayweb.page, 벤더링됨)
 ├── wacz/<학기>/     아카이브 파일 (.wacz)
-├── 캡처.command     명단 갱신 + 캡처
-├── 보기.command     로컬 서버 + 브라우저 열기
+├── archive.py      캡처/보기/편집을 실행하는 OS 중립 CLI
 └── tools/          파이썬 도구와 로컬 manifest 편집기
 ```
 
@@ -107,7 +130,7 @@ archivve/
 | `recapture-needed` | 다시 캡처 필요 | 숨김 |
 | `private` / `hidden` | 비공개 | 숨김 |
 
-빈 status는 `pending`과 동일하게 취급한다. `캡처.command`는 빈 값, `pending`,
+빈 status는 `pending`과 동일하게 취급한다. `python3 archive.py capture`는 빈 값, `pending`,
 `ready-to-capture`, `recapture-needed`를 캡처 대상으로 본다. 캡처가 끝나면
 `review-needed`가 되며, 사람이 재생을 확인한 뒤 `ok` 또는 `partial`로 바꾼다.
 
