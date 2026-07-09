@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Archived Work</title>
+  <style>
+    :root {
+      --bg: #ffffff;
+      --text: #111111;
+      --muted: #666666;
+      --line: #111111;
+      --mark: #f4e850;
+      --font: Arial, "Helvetica Neue", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+
+    body.viewer-body {
+      margin: 0;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      font-size: 14px;
+    }
+
+    .viewer-bar {
+      flex: 0 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--line);
+      text-transform: uppercase;
+    }
+
+    .viewer-bar a {
+      color: inherit;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
+    .viewer-bar a:hover { background: var(--mark); }
+
+    .viewer-bar > div {
+      flex: 1 1 auto;
+      min-width: 0;
+      text-align: center;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    #viewer-title { font-weight: 700; }
+    #viewer-meta { color: var(--muted); margin-left: 8px; text-transform: none; }
+
+    .viewer-frame {
+      flex: 1 1 auto;
+      min-height: 0;
+      display: flex;
+    }
+
+    .viewer-frame replay-web-page {
+      flex: 1 1 auto;
+      width: 100%;
+      height: 100%;
+      border: 0;
+      display: block;
+    }
+
+    .viewer-message {
+      margin: auto;
+      padding: 40px;
+      color: var(--muted);
+    }
+  </style>
+</head>
+<body class="viewer-body">
+  <header class="viewer-bar">
+    <a href="index.html">archivve</a>
+    <div>
+      <strong id="viewer-title">Archived Work</strong>
+      <span id="viewer-meta"></span>
+    </div>
+    <a id="viewer-original" href="#" target="_blank" rel="noopener">Original</a>
+  </header>
+  <main class="viewer-frame" id="viewer-frame"></main>
+
+  <script>
+    const params = new URLSearchParams(location.search);
+    const source = params.get("source") || "";
+    const url = params.get("url") || "";
+    const title = params.get("title") || "Archived Work";
+    const student = params.get("student") || "";
+
+    document.title = title;
+    document.getElementById("viewer-title").textContent = title;
+    document.getElementById("viewer-meta").textContent = student;
+    const originalLink = document.getElementById("viewer-original");
+    if (url) {
+      originalLink.href = url;
+    } else {
+      originalLink.hidden = true;
+    }
+
+    function showMessage(message) {
+      const frame = document.getElementById("viewer-frame");
+      frame.innerHTML = "";
+      const box = document.createElement("section");
+      box.className = "viewer-message";
+      box.textContent = message;
+      frame.appendChild(box);
+    }
+
+    if (!source || !url) {
+      showMessage("Archive source is missing. Capture this row first, then return here.");
+    } else {
+      const replayScript = document.createElement("script");
+      replayScript.src = "replay/ui.js";
+      replayScript.onload = () => {
+        const replay = document.createElement("replay-web-page");
+        replay.setAttribute("replayBase", "replay/");
+        replay.setAttribute("source", source);
+        replay.setAttribute("url", url);
+        // 캡처된 페이지만 재생하고 ReplayWeb 자체 주소바/툴바는 숨긴다.
+        // (페이지 위쪽의 자체 viewer-bar로 제목·원본 링크를 이미 제공)
+        replay.setAttribute("embed", "replayonly");
+        document.getElementById("viewer-frame").appendChild(replay);
+      };
+      replayScript.onerror = () => {
+        showMessage("replay/ 폴더에 재생 런타임이 없습니다.");
+      };
+      document.body.appendChild(replayScript);
+    }
+  </script>
+</body>
+</html>

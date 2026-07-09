@@ -139,7 +139,7 @@
 
     .row {
       display: grid;
-      grid-template-columns: 48px minmax(180px, 1.2fr) minmax(180px, 1.3fr) minmax(240px, 2fr) 150px minmax(220px, 1.4fr);
+      grid-template-columns: 48px minmax(160px, 1fr) minmax(120px, 0.8fr) minmax(180px, 1.2fr) minmax(240px, 2fr) 150px minmax(220px, 1.4fr);
       gap: 10px;
       padding: 10px 0;
       border-color: var(--soft);
@@ -255,15 +255,15 @@
   <script>
     const REQUIRED_FIELDS = [
       "student_name",
+      "semester",
       "title",
       "original_url",
-      "semester",
-      "wacz_file",
-      "wacz_url",
-      "archived_date",
-      "sha256",
       "status",
       "notes",
+      "drive_link",
+      "wacz_file",
+      "archived_date",
+      "sha256",
     ];
 
     const STATUSES = [
@@ -390,7 +390,7 @@
       const warnings = [];
       const status = rowStatus(row);
       const url = clean(row.original_url);
-      const hasWacz = clean(row.wacz_file) || clean(row.wacz_url);
+      const hasWacz = clean(row.wacz_file);
 
       if (!clean(row.student_name)) errors.push("student_name 비어 있음");
       if (!clean(row.semester)) errors.push("semester 비어 있음");
@@ -400,7 +400,7 @@
         errors.push("이 status에는 original_url이 필요함");
       }
       if (["ok", "partial", "review-needed"].includes(status) && !hasWacz) {
-        warnings.push("재생/공개 상태인데 wacz_file 또는 wacz_url이 비어 있음");
+        warnings.push("재생/공개 상태인데 wacz_file이 비어 있음");
       }
       if (!status) warnings.push("status 비어 있음. 의도적이면 pending과 동일하게 처리됨");
 
@@ -465,7 +465,6 @@
 
       const links = [
         ["Original", row.original_url],
-        ["WACZ", row.wacz_url],
         ["Drive", row.drive_link],
       ];
 
@@ -510,6 +509,7 @@
         item.append(
           number,
           makeInput(row, "student_name"),
+          makeInput(row, "semester"),
           makeInput(row, "title"),
           makeInput(row, "original_url"),
           makeInput(row, "status"),

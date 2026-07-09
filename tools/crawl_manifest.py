@@ -1,29 +1,31 @@
 #!/usr/bin/env python3
-"""Capture selected manifest rows with Browsertrix Crawler."""
+"""Capture selected manifest rows with Playwright (no Docker)."""
 
 from __future__ import annotations
 
 import argparse
 import csv
 import hashlib
-import shutil
 import subprocess
+import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+# 편집 칸(왼쪽) + 기계가 채우는 칸(오른쪽). type·wacz_url은 쓰지 않는다.
 DEFAULT_FIELDS = [
     "student_name",
+    "semester",
     "title",
     "original_url",
-    "semester",
-    "wacz_file",
-    "wacz_url",
-    "archived_date",
-    "sha256",
     "status",
     "notes",
+    "drive_link",
+    "wacz_file",
+    "archived_date",
+    "sha256",
 ]
 
 
@@ -87,7 +89,7 @@ def should_capture(row: dict[str, str], semester: str, mode: str, match: str) ->
     status = clean(row.get("status")).lower()
     if not clean(row.get("original_url")):
         return False
-    if status == "private":
+    if status in {"private", "hidden"}:
         return False
     if semester and clean(row.get("semester")) != semester:
         return False
@@ -98,58 +100,24 @@ def should_capture(row: dict[str, str], semester: str, mode: str, match: str) ->
     return status in {"", "pending", "ready-to-capture", "recapture-needed"}
 
 
-def find_wacz(crawls_dir: Path, collection: str) -> Path:
-    expected = crawls_dir / "collections" / collection / f"{collection}.wacz"
-    if expected.exists():
-        return expected
-
-    matches = list(crawls_dir.rglob(f"{collection}.wacz"))
-    if matches:
-        return matches[0]
-
-    raise FileNotFoundError(f"Could not find {collection}.wacz under {crawls_dir}")
-
-
 def run_crawl(args: argparse.Namespace, row: dict[str, str], out_dir: Path) -> Path:
+    """Docker 없이 Playwright로 캡처해 out_dir/<semester>/<wacz_file> 에 저장한다."""
+    from capture_playwright import capture
+
     semester = clean(row.get("semester")) or "undated"
     base_id = clean(row.get("student_name")) or clean(row.get("title"))
     wacz_file = clean(row.get("wacz_file")) or f"{slug(base_id)}-{slug(semester)}.wacz"
-    collection = wacz_file.removesuffix(".wacz")
-    crawls_dir = ROOT / "crawls"
-
-    command = [
-        "docker",
-        "run",
-        "--rm",
-        "-v",
-        f"{crawls_dir}:/crawls/",
-        args.image,
-        "crawl",
-        "--url",
-        clean(row.get("original_url")),
-        "--scopeType",
-        args.scope_type,
-        "--depth",
-        str(args.depth),
-        "--pageLimit",
-        str(args.page_limit),
-        "--behaviors",
-        args.behaviors,
-        "--generateWACZ",
-        "--collection",
-        collection,
-        "--overwrite",
-        "--title",
-        clean(row.get("title")) or collection,
-        "--description",
-        f"{clean(row.get('student_name'))} / {semester}",
-    ]
-
-    subprocess.run(command, cwd=ROOT, check=True)
-    found = find_wacz(crawls_dir, collection)
     target = out_dir / semester / wacz_file
     target.parent.mkdir(parents=True, exist_ok=True)
-    shutil.copy2(found, target)
+
+    capture(
+        clean(row.get("original_url")),
+        target,
+        page_limit=int(args.page_limit),
+        depth=int(args.depth),
+        title=clean(row.get("title")) or wacz_file.removesuffix(".wacz"),
+        description=f"{clean(row.get('student_name'))} / {semester}",
+    )
 
     row["wacz_file"] = wacz_file
     row["archived_date"] = datetime.now(timezone.utc).date().isoformat()
@@ -163,14 +131,11 @@ def run_crawl(args: argparse.Namespace, row: dict[str, str], out_dir: Path) -> P
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--manifest", default=str(ROOT / "manifest.csv"))
-    parser.add_argument("--out-dir", default=str(ROOT / "out"))
+    parser.add_argument("--out-dir", default=str(ROOT / "wacz"))
     parser.add_argument("--semester", default="")
     parser.add_argument("--mode", choices=["pending", "all"], default="pending")
-    parser.add_argument("--image", default="webrecorder/browsertrix-crawler:1.13.0")
-    parser.add_argument("--scope-type", default="prefix")
-    parser.add_argument("--depth", type=int, default=5)
-    parser.add_argument("--page-limit", type=int, default=100)
-    parser.add_argument("--behaviors", default="autoscroll")
+    parser.add_argument("--depth", type=int, default=3)
+    parser.add_argument("--page-limit", type=int, default=30)
     parser.add_argument("--match", default="")
     args = parser.parse_args()
 
@@ -179,20 +144,18 @@ def main() -> None:
     out_dir.mkdir(parents=True, exist_ok=True)
     fields, rows = read_manifest(manifest)
     selected = [row for row in rows if should_capture(row, args.semester, args.mode, args.match)]
-    asset_list = out_dir / "release-assets.tsv"
     failed: list[str] = []
 
-    with asset_list.open("w", encoding="utf-8") as assets:
-        for row in selected:
-            url = clean(row.get("original_url"))
-            try:
-                target = run_crawl(args, row, out_dir)
-            except (subprocess.CalledProcessError, FileNotFoundError) as error:
-                print(f"ERROR: {url} failed: {error}")
-                row["status"] = "recapture-needed"
-                failed.append(url)
-                continue
-            assets.write(f"{clean(row.get('semester'))}\t{target}\n")
+    for row in selected:
+        url = clean(row.get("original_url"))
+        print(f"캡처 중: {clean(row.get('student_name')) or url} — {url}")
+        try:
+            run_crawl(args, row, out_dir)
+        except (subprocess.CalledProcessError, FileNotFoundError, RuntimeError) as error:
+            print(f"ERROR: {url} failed: {error}")
+            row["status"] = "recapture-needed"
+            failed.append(url)
+            continue
 
     write_manifest(manifest, fields, rows)
     print(f"Captured {len(selected) - len(failed)} of {len(selected)} item(s).")

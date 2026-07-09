@@ -79,12 +79,13 @@
 
   <div class="doc-title">KAIST 디자인 스튜디오 I — 학생 웹 작업물 아카이브</div>
   <div class="meta">진행 및 관리 문서 (Project Log &amp; Operations Handbook)</div>
-  <div class="meta">최종 갱신: 2026-06-12 · 대상 학기: 2026-spring</div>
+  <div class="meta">최종 갱신: 2026-07-09 · 대상 학기: 2026-spring</div>
 
   <hr>
 
   <div class="section-label">0. 이 문서는</div>
   <p>학생들의 웹 작업물을 캡처 시점 그대로 보존하기 위한 아카이브 시스템을, (1) 어떻게 만들고 진행해 왔는지, (2) 앞으로 어떻게 관리·운영하면 되는지 정리한 문서입니다. 담당자(교수·조교)가 바뀌어도 이 문서 하나로 이어받을 수 있도록 작성했습니다.</p>
+  <p><strong>2026-07 개정:</strong> 온라인 사이트·자동화·클라우드(GitHub Actions·Pages·Docker)를 걷어내고, <strong>폴더 하나가 곧 아카이브</strong>인 자족적 구조로 단순화했습니다. 실무는 "구글 시트에 링크 접수 → <code>캡처.command</code> → <code>보기.command</code>" 세 동작이면 끝납니다.</p>
   <ul class="toc">
     <li>1. 프로젝트 개요</li>
     <li>2. 왜 이렇게 만들었나 (설계 배경)</li>
@@ -98,142 +99,167 @@
 
   <div class="section-label">1. 프로젝트 개요</div>
   <p>목적은 단순합니다. 학생들이 만든 웹사이트(대부분 GitHub Pages 포트폴리오)는 졸업·호스팅 만료·계정 정리 등으로 <strong>언젠가 사라집니다.</strong> 살아 있을 때 통째로 박제해 두어, 학기가 끝나고 몇 년이 지나도 그 시점의 모습을 그대로 탐색할 수 있게 하는 것이 목표입니다.</p>
-  <p>규모는 학기당 약 35명이며, 매 학기 반복하고 가능한 한 오래 — 평생 단위로 — 운영하는 것을 전제로 합니다. 그래서 모든 선택의 기준은 "10년 뒤에도 살아 있을 기술인가"였습니다.</p>
+  <p>규모는 학기당 약 35명이며, 매 학기 반복하고 가능한 한 오래 — 평생 단위로 — 운영하는 것을 전제로 합니다. 그래서 모든 선택의 기준은 "10~20년 뒤에도 살아 있고 옮길 수 있는 기술인가"였습니다.</p>
 
   <div class="section-label">2. 왜 이렇게 만들었나 (설계 배경)</div>
-  <p>처음 참고점은 Rhizome의 Conifer였지만, Conifer 서비스는 2026년 6월경 종료되었습니다(신규 가입은 2025년 12월 마감). 다행히 Conifer를 만든 Webrecorder 팀의 후속 도구들이 더 오래 가는 형태로 존재했고, 이 시스템은 그 도구들 위에 세웠습니다.</p>
+  <p>처음 참고점은 Rhizome의 Conifer였지만, Conifer 서비스는 2026년경 종료되었습니다. 다행히 Conifer를 만든 Webrecorder 팀의 후속 도구들이 더 오래 가는 형태(개방형 포맷)로 존재했고, 이 시스템은 그 포맷 위에 세웠습니다. <strong>특정 서비스가 아니라 표준 파일에 베팅</strong>한다는 뜻입니다.</p>
   <p>핵심 보존 원칙은 다음과 같습니다.</p>
   <ul>
-    <li>개방형 표준만 쓴다 — 아카이브 포맷은 WARC/WACZ(국제표준). 특정 회사가 사라져도 열 수 있습니다.</li>
-    <li>서버에 의존하지 않는다 — 재생기는 브라우저 안에서 동작하므로, 정적 파일만 있으면 됩니다. 관리할 서버·DB가 없습니다.</li>
+    <li>개방형 표준만 쓴다 — 아카이브 포맷은 WARC/WACZ(ISO 28500 국제표준). 특정 회사가 사라져도 열 수 있습니다.</li>
+    <li>서버에 의존하지 않는다 — 재생기는 브라우저 안에서 동작하므로 정적 파일만 있으면 됩니다. 관리할 서버·DB가 없습니다.</li>
     <li>프레임워크 churn을 피한다 — 사이트 본체는 빌드가 필요 없는 순수 HTML + 약간의 바닐라 JS. 썩을 빌드 단계가 없습니다.</li>
-    <li>사람이 읽는 단일 출처 — 누가 무엇을 언제 캡처했는지는 텍스트 파일(CSV) 하나로 관리합니다.</li>
-    <li>복제가 곧 보존이다 — 원본 WACZ는 여러 곳에 사본을 둡니다.</li>
+    <li>사람이 읽는 단일 출처 — 누가 무엇을 언제 캡처했는지는 텍스트 파일(<code>manifest.csv</code>) 하나로 관리합니다.</li>
+    <li>복제가 곧 보존이다 — 폴더를 여러 곳(USB·드라이브)에 사본으로 둡니다.</li>
+    <li>도구와 자산을 분리한다 — 캡처 도구는 소모품이지만 결과물(WACZ)은 표준이라 안 변합니다. 도구가 낡아도 이미 만든 아카이브는 영원히 유효합니다.</li>
   </ul>
+  <p>이 원칙에서 자연스럽게 나온 2026-07 결론이 <strong>"온라인 인프라를 걷어내고 자족적 폴더로"</strong>입니다. GitHub Actions·Pages·Releases·Docker는 편리하지만 2~3년마다 손봐야 하는 유지보수 부채였고, 오래 가는 핵심에는 필요 없었습니다.</p>
 
   <div class="section-label">3. 기술 구성</div>
   <table>
     <tr><th>역할</th><th>사용 기술</th><th>한 줄 설명</th></tr>
-    <tr><td>캡처</td><td>browsertrix-crawler (Docker)</td><td>실제 브라우저로 사이트를 돌며 WACZ 하나로 패키징</td></tr>
+    <tr><td>캡처</td><td>Playwright (실제 Chromium)</td><td>실제 브라우저로 사이트를 돌며 WACZ로 패키징. <strong>Docker 불필요</strong></td></tr>
     <tr><td>보존 포맷</td><td>WACZ (WARC 기반)</td><td>국제표준 아카이브 포맷. ZIP으로 묶여 이동·보관 용이</td></tr>
-    <tr><td>재생</td><td>replayweb.page</td><td>서버 없이 브라우저에서 WACZ를 그대로 재생 (ui.js/sw.js 자가호스팅, 버전 고정)</td></tr>
-    <tr><td>색인/메타데이터</td><td>manifest.csv</td><td>학생·제목·URL·상태의 단일 출처. 빌드 시 index.json 생성</td></tr>
-    <tr><td>자동화</td><td>GitHub Actions</td><td>매니페스트 변경 → 캡처 → 배포까지 자동</td></tr>
-    <tr><td>호스팅</td><td>GitHub Pages</td><td>무료 정적 호스팅. 빌드 도구 불필요</td></tr>
+    <tr><td>재생</td><td>replayweb.page</td><td>서버 없이 브라우저에서 WACZ를 그대로 재생 (<code>replay/</code>에 자가호스팅, 버전 고정)</td></tr>
+    <tr><td>접수</td><td>구글 시트</td><td>학생 <strong>이름·수업·링크</strong>만 넣는 접수함</td></tr>
+    <tr><td>관리·색인</td><td>manifest.csv</td><td>상태·결과의 관리 원본. 목록 페이지가 직접 읽음</td></tr>
+    <tr><td>실행</td><td>캡처.command / 보기.command</td><td>더블클릭으로 캡처하고 본다. 외부 서비스 0개</td></tr>
+    <tr><td>저장·전달</td><td>자족적 폴더 (USB·드라이브)</td><td>폴더 하나가 곧 아카이브. 복사가 곧 백업</td></tr>
   </table>
 
   <div class="section-label">4. 어떻게 진행했나 (작업 경위)</div>
 
-  <div class="sub">4.1 리포지토리 구성</div>
-  <p>코드(가벼운 텍스트)와 아카이브(무거운 WACZ)를 분리했습니다. WACZ는 <code>.gitignore</code>로 git 본문에서 제외하고, 빌드 때 <code>site/wacz/</code>로 모아 Pages에서 같은 출처로 재생합니다. 덕분에 리포 본체는 수 MB로 가볍습니다.</p>
+  <div class="sub">4.1 매니페스트 단일 출처</div>
+  <p>모든 것의 기준은 <code>manifest.csv</code> 한 파일입니다. 여기에 상태·URL·캡처 결과가 모입니다. 학생 목록은 이름순으로 정렬해 두었습니다.</p>
 
-  <div class="sub">4.2 매니페스트 단일 출처</div>
-  <p>모든 것의 기준은 <code>manifest.csv</code> 한 파일입니다. 여기에 한 줄을 추가/수정하면, 자동화가 그 줄을 읽어 캡처하고 사이트 목록을 갱신합니다. 학생 목록은 이름 알파벳순으로 정렬해 두었습니다.</p>
+  <div class="sub">4.2 1차 캡처</div>
+  <p>학생들이 제출한 URL을 모아 일괄 캡처했습니다. 대다수 작품이 정상 WACZ로 박제되었고, 압축 무결성 검사에서도 손상 없이 통과했습니다.</p>
 
-  <div class="sub">4.3 1차 캡처</div>
-  <p>학생들이 제출한 URL을 모아 일괄 캡처했습니다. 이 과정에서 대다수 작품이 정상 WACZ로 박제되었고, 압축 무결성 검사에서도 손상 없이 통과했습니다.</p>
+  <div class="sub">4.3 링크 깨짐 발견과 교정</div>
+  <p>1차 수집 때 URL을 스프레드시트(Numbers) 화면에서 눈으로 옮기는 과정에서 GitHub 아이디 철자가 한두 글자씩 틀린 경우가 다수 있었습니다(예: <code>brgnmoru</code> → <code>brgnmorum</code>, <code>s000j6</code> → <code>s000jing</code>, <code>yoandzhy</code> → <code>yoondzhy</code>). 틀린 주소로 캡처되면 빈 페이지가 박제됩니다. 교수님이 주신 정본 링크와 매니페스트를 한 줄씩 대조하고, <strong>교정한 URL이 실제로 살아 있는 작품 페이지인지 전수 확인</strong>한 뒤, 각 행의 <code>notes</code>에 무엇을 왜 고쳤는지 기록했습니다.</p>
 
-  <div class="sub">4.4 링크 깨짐 발견과 교정</div>
-  <p>1차 수집 때 URL을 스프레드시트(Numbers) 화면에서 눈으로 옮기는 과정에서 GitHub 아이디 철자가 한두 글자씩 틀린 경우가 다수 있었습니다(예: <code>brgnmoru</code> → <code>brgnmorum</code>, <code>s000j6</code> → <code>s000jing</code>, <code>yoandzhy</code> → <code>yoondzhy</code>). 틀린 주소로 캡처되면 빈 페이지가 박제됩니다.</p>
-  <p>이를 바로잡기 위해, 교수님이 주신 정본 링크 목록과 매니페스트를 한 줄씩 대조하고, <strong>교정한 URL이 실제로 살아 있는 학생 작품 페이지인지 전수 확인</strong>했습니다. URL이 비어 있던 일부 학생은 추정 주소가 실제로 정확한 것으로 확인되어 캡처 대기로 전환했습니다. 각 행의 <code>notes</code> 칸에 무엇을 왜 고쳤는지 기록해 두었습니다.</p>
-
-  <div class="sub">4.5 상태 정리</div>
-  <p>교정 결과, 정상 캡처되어 공개 중인 작품과, URL은 확정됐지만 (재)캡처가 필요한 작품, 그리고 아직 URL을 받지 못한 학생으로 구분해 매니페스트 상태값을 정리했습니다. 구체적 수치는 6장을 참고하세요.</p>
+  <div class="sub">4.4 자족적 폴더로 재설계 (2026-07)</div>
+  <p>초기에는 GitHub Actions로 자동 캡처하고 Pages/Releases로 배포하는 클라우드 방식이었습니다. 오래 가는 관점에서 이는 유지보수 부채였으므로, 다음과 같이 단순화했습니다.</p>
+  <ul>
+    <li>캡처를 Docker(browsertrix) 대신 <strong>Playwright</strong>로 바꿔 로컬 Mac에서 바로 돌게 했습니다.</li>
+    <li>GitHub Actions·Pages·Releases와 중복 프론트엔드(<code>site/</code>)를 제거하고, 루트에 자족적 목록·재생 페이지 한 벌만 두었습니다.</li>
+    <li>목록 페이지가 로컬 <code>manifest.csv</code>를 직접 읽도록 바꿔, 보는 시점에는 인터넷·구글이 전혀 필요 없습니다.</li>
+    <li>구글 시트의 역할을 <strong>접수함(이름·수업·링크)</strong>으로 축소하고, 관리는 <code>manifest.csv</code>로 일원화했습니다.</li>
+  </ul>
 
   <div class="section-label">5. 어떻게 관리하나 (운영 매뉴얼)</div>
 
-  <div class="sub">5.1 학생·작품 추가하기</div>
-  <p><code>manifest.csv</code>에 한 줄을 추가합니다. 최소한 이름·제목·URL·학기를 채우고, 상태는 <code>pending</code>으로 둡니다. 나머지(파일명·해시·날짜)는 캡처 단계에서 자동으로 채워집니다.</p>
+  <div class="sub">5.1 역할 분담 — 시트는 접수, CSV는 관리</div>
+  <p><strong>구글 시트 = 접수함.</strong> 새 학생의 <strong>이름·수업(semester)·링크(original_url)</strong>만 넣습니다(학생이 직접 채우게 해도 됩니다). <strong><code>manifest.csv</code> = 관리 원본.</strong> 캡처 결과·상태·메모 등 모든 관리는 여기서 합니다(Numbers·Excel·텍스트로 편집).</p>
+  <p><code>캡처.command</code>가 시트의 <strong>새 학생만</strong> <code>manifest.csv</code>로 가져와 <code>pending</code>으로 넣습니다. 이미 있는 학생의 관리 데이터는 절대 건드리지 않으므로 두 곳이 어긋나지 않습니다. <strong>주의:</strong> 캡처 결과는 시트로 되돌아 쓰이지 않습니다 — 시트에서 상태·파일명 칸이 비어 보이는 것은 정상이며, 관리 현황은 <code>admin.html</code>에서 봅니다.</p>
 
-  <div class="sub">5.2 상태값(status)의 의미</div>
+  <div class="sub">5.2 평소 3단계</div>
+  <ol>
+    <li><strong>접수(구글 시트)</strong> — 새 학생을 이름·수업·링크로 한 줄 추가.</li>
+    <li><strong>캡처(<code>캡처.command</code> 더블클릭)</strong> — 시트의 새 학생을 가져온 뒤 <strong>캡처할 작품 목록을 보여주고, 엔터 한 번</strong>이면 대기 중인 작품을 <code>wacz/&lt;학기&gt;/</code>에 저장. (처음 실행 시 캡처 도구 설치를 물어보고 자동으로 깔아줍니다. 특정 학생만 다시 캡처하려면 manifest.csv에서 그 학생 status를 <code>recapture-needed</code>로.)</li>
+    <li><strong>보기(<code>보기.command</code> 더블클릭)</strong> — 로컬 서버를 띄우고 브라우저로 목록·재생을 확인.</li>
+  </ol>
+  <p class="note-box"><code>index.html</code>을 직접 더블클릭하면 재생이 안 됩니다. WACZ 재생은 서비스워커를 쓰는데 이는 파일 직접 열기(<code>file://</code>)에서 동작하지 않으므로, 반드시 <code>보기.command</code>로 로컬 서버를 통해 엽니다. macOS 내장 파이썬만 있으면 되므로 보기에는 별도 설치가 필요 없습니다.</p>
+
+  <div class="sub">5.3 상태값(status)의 의미</div>
   <table>
-    <tr><th>status</th><th>의미</th><th>사이트 노출</th></tr>
-    <tr><td>ok</td><td>정상 캡처 완료, 재생 가능</td><td>공개됨</td></tr>
-    <tr><td>pending</td><td>아직 캡처 전 (또는 URL 대기)</td><td>숨김</td></tr>
-    <tr><td>recapture-needed</td><td>다시 캡처가 필요함</td><td>숨김</td></tr>
-    <tr><td>private</td><td>학생 요청·저작권·개인정보 등으로 비공개</td><td>숨김 (색인에서도 제외)</td></tr>
+    <tr><th>status</th><th>의미</th><th>목록 노출</th></tr>
+    <tr><td>ok</td><td>정상 캡처 완료, 재생 가능</td><td>공개 (재생 가능)</td></tr>
+    <tr><td>pending (또는 빈칸)</td><td>아직 캡처 전 (또는 URL 대기)</td><td>대기 목록(admin)</td></tr>
+    <tr><td>recapture-needed</td><td>다시 캡처가 필요함</td><td>다음 캡처 대상</td></tr>
+    <tr><td>private / hidden</td><td>학생 요청·저작권·개인정보 등으로 비공개</td><td>공개 목록에서 숨김</td></tr>
   </table>
-  <p>비어 있는 <code>wacz_file</code> 행은 자동으로 사이트에 노출되지 않으므로, 캡처 전 학생이 목록에 잘못 뜰 걱정은 없습니다.</p>
+  <p><code>wacz_file</code>이 비어 있거나 status가 ok가 아닌 행은 목록에서 Archive 버튼이 생기지 않으므로, 캡처 전 학생이 잘못 재생될 걱정은 없습니다.</p>
 
-  <div class="sub">5.3 캡처 실행하기</div>
-  <p>GitHub 저장소의 Actions 탭에서 <strong>"Archive student sites"</strong> 워크플로우를 실행합니다. <code>mode</code>를 <code>pending</code>으로 두면 아직 캡처되지 않은(대기 중) 학생만 골라 캡처합니다. 필요하면 학기·이름 필터, 페이지 수·크롤 깊이도 지정할 수 있습니다. 매니페스트만 푸시해도 자동으로 돌도록 설정되어 있습니다.</p>
-  <p>참고: 캡처 엔진은 Docker로 동작하므로 캡처 자체는 GitHub Actions(또는 Docker가 있는 로컬 PC)에서 수행됩니다.</p>
-
-  <div class="sub">5.4 사이트 배포</div>
-  <p>매니페스트나 <code>site/</code>가 바뀌면 <strong>"Deploy archive site to Pages"</strong> 워크플로우가 <code>index.json</code>을 새로 만들고 WACZ를 모아 Pages에 배포합니다. 잘못 캡처된 옛 파일은 배포 때 폴더를 새로 만들며 자동 정리됩니다.</p>
+  <div class="sub">5.4 최초 1회 준비 (캡처하는 Mac에서만)</div>
+  <p>캡처에는 파이썬 도구가 필요합니다. 한 번만 설치합니다.</p>
+<pre>python3 -m pip install playwright warcio wacz pillow
+python3 -m playwright install chromium</pre>
+  <p>보기만 하는 사람은 이 설치가 필요 없습니다. 처음 <code>.command</code>를 더블클릭하면 "확인되지 않은 개발자" 경고가 뜰 수 있는데, 파일을 우클릭 → 열기를 한 번만 하면 이후로는 그냥 더블클릭됩니다.</p>
 
   <div class="sub">5.5 매 학기 루틴</div>
   <ol>
     <li>학생들에게 공개 URL을 수집한다 (사이트가 살아 있을 때, 학기 중·직후).</li>
-    <li>manifest.csv에 그 학기 학생들을 추가한다 (학기 태그 통일: 예 <code>2026-fall</code>).</li>
-    <li>"Archive student sites" 실행 → 캡처.</li>
-    <li>사이트에서 각 작품이 제대로 재생되는지 점검한다 (특히 인터랙티브 작품).</li>
-    <li>부실 캡처는 옵션을 조정해 다시 실행한다.</li>
-    <li>그 학기 WACZ 묶음을 외부 백업에도 복제한다.</li>
+    <li>구글 시트(접수함)에 그 학기 학생을 추가한다 — 이름·수업·링크만 (학기 태그 통일: 예 <code>2026-fall</code>).</li>
+    <li><code>캡처.command</code> 실행 → 캡처.</li>
+    <li><code>보기.command</code>로 각 작품이 제대로 재생되는지 점검한다 (특히 인터랙티브 작품).</li>
+    <li>부실 캡처는 <code>manifest.csv</code>에서 status를 <code>recapture-needed</code>로 바꾸고 다시 실행한다.</li>
+    <li>그 학기 결과가 반영된 <strong>폴더를 USB·드라이브에 복사</strong>해 백업한다.</li>
   </ol>
 
   <div class="sub">5.6 백업과 장기 보존</div>
-  <p>모든 WACZ는 최소 두세 벌, 서로 다른 위치에 둡니다(예: GitHub, 학교/개인 외장 저장소, 클라우드 객체저장소). 1년에 한 번 파일이 손상되지 않았는지(해시 일치) 점검합니다. 저장 총량이 수십 GB로 커지면 WACZ만 외부 저장소로 옮기고 사이트가 그 주소를 가리키게 하면 되며, 정적 방식이라 나머지는 그대로 둡니다.</p>
+  <p>저장 매체가 이 폴더 하나이므로 <strong>복제가 곧 보존</strong>입니다. 폴더를 최소 두세 벌(작업용 Mac·외장 USB·클라우드 드라이브 등)에 둡니다. 각 WACZ의 SHA-256이 매니페스트에 기록되어 있으니, 1년에 한 번 손상 여부(해시 일치)를 점검합니다. 재생기(<code>replay/</code>)가 먼 미래에 브라우저에서 안 돌더라도, 표준 WARC를 품은 WACZ는 그 시절의 다른 도구로 다시 열 수 있으므로 <strong>원본 WACZ 보관이 최우선</strong>입니다.</p>
 
   <div class="sub">5.7 인수인계</div>
-  <p>다음 담당자에게 (1) GitHub 계정 접근 방법, (2) manifest.csv에 줄 추가하는 법, (3) replayweb.page 고정 버전, (4) 백업 위치를 전달하면 됩니다. 시스템이 단순할수록 오래갑니다 — 이 시스템이 단순한 이유입니다.</p>
+  <p>다음 담당자에게 (1) 원본 폴더와 백업 사본의 위치, (2) 접수용 구글 시트 접근, (3) 사용법(이 문서·README), (4) 최초 설치(5.4)를 전달하면 됩니다. 시스템이 단순할수록 오래갑니다 — 이 시스템이 단순한 이유입니다.</p>
 
   <div class="section-label">6. 현재 상태 요약 (2026-spring)</div>
   <div class="note-box">
-    전체 학생 35명 · 정상 공개(재생 가능) 17명 · (재)캡처 대기 14명 (URL 확정·검증 완료) · URL 미정 4명
+    전체 35명 · 캡처 완료(로컬 재생 가능) 34 · 링크 대기 1 (Seungyun Lee) — 2026-07-09 전 학생 로컬 캡처 완료
   </div>
-  <p>남은 일은 두 가지뿐입니다.</p>
+  <p>남은 일 / 참고:</p>
   <ul>
-    <li>(재)캡처 대기 14명 — "Archive student sites"를 <code>mode=pending</code>으로 실행하면 자동 처리됩니다. 링크는 모두 생존 확인을 마쳤습니다.</li>
-    <li>URL 미정 4명 — SeoHyeon Kim, Seungyun Lee, David Tsoy, Jaemin Han. 학생에게 주소만 받으면 됩니다.</li>
+    <li><strong>링크 대기 1명</strong> — Seungyun Lee. 학생에게 주소만 받아 시트에 넣고 <code>캡처.command</code>를 돌리면 됩니다.</li>
+    <li><strong>Seoyun Oh</strong> — 원본 페이지 자체가 거의 비어 있습니다(placeholder 텍스트 + 2바이트짜리 깨진 이미지). 캡처는 정상이며, 학생 페이지가 완성되면 다시 캡처하면 됩니다.</li>
+    <li><strong>Kincso(Whimsical Bridge)</strong> — 24MB로 캡처됐고 파일은 유효하지만, 무거운 페이지라 재생에 시간이 더 걸립니다. <code>보기.command</code>에서 실제로 열어 확인하고, 안 뜨면 재캡처합니다.</li>
+    <li><strong>정리 이력</strong> — 철자 다른 파일명으로 중복 접수됐던 2명(Myeonghyeon Choi·Hyunjoon Jeong)을 병합해 37→35명이 됐습니다. URL 오타로 옛 WACZ가 틀린 사이트를 담고 있던 6명은 교정 주소로 재캡처 완료.</li>
   </ul>
 
   <div class="section-label">7. 자주 생기는 문제와 대응</div>
+  <div class="sub">Archive를 눌렀는데 빈 화면</div>
+  <p>해당 WACZ가 <code>wacz/&lt;학기&gt;/</code>에 없거나(캡처 전), 파일명이 규칙과 안 맞는 경우입니다. <code>admin.html</code>에서 상태·캡처일을 확인하고, 없으면 그 학생을 다시 캡처합니다.</p>
+  <div class="sub">"Archived Page Not Found" (재생 화면 안에)</div>
+  <p>WACZ가 <strong>지금 manifest의 주소와 다른(옛/틀린) 주소로 캡처</strong>된 경우입니다. URL을 나중에 교정했지만 재캡처하지 않으면 이렇게 됩니다. 그 학생 status를 <code>recapture-needed</code>로 바꾸고 <code>캡처.command</code>를 다시 돌리면 교정된 주소로 새로 잡습니다.</p>
+  <div class="sub">목록이 안 뜸 / "manifest.csv를 읽지 못했습니다"</div>
+  <p><code>index.html</code>을 직접 연 경우입니다. <code>보기.command</code>로 다시 엽니다(로컬 서버가 필요).</p>
+  <div class="sub">"lack of range request support" (큰 작품 재생 실패)</div>
+  <p>큰 WACZ는 재생기가 파일을 통째로 안 받고 <strong>구간 요청(Range)</strong>으로 읽는데, 파이썬 기본 서버는 이를 지원하지 않습니다. <code>보기.command</code>는 Range를 지원하는 서버(<code>tools/serve.py</code>)를 쓰므로 이 오류가 안 납니다. 만약 이 오류가 보이면 <code>python3 -m http.server</code> 같은 기본 서버로 연 것이니, <strong>반드시 <code>보기.command</code></strong>로 여세요.</p>
   <div class="sub">URL 오타</div>
-  <p>가장 흔합니다. 화면에서 옮길 때 한두 글자가 틀립니다. 캡처 전, 브라우저로 실제 열어 200으로 뜨는지 확인하면 빈 페이지 박제를 막을 수 있습니다.</p>
+  <p>가장 흔합니다. 화면에서 옮길 때 한두 글자가 틀립니다. 캡처 전 브라우저로 실제 열어 정상 페이지인지 확인하면 빈 페이지 박제를 막을 수 있습니다.</p>
   <div class="sub">파일명에 공백·한글</div>
-  <p>일부 작품은 이미지 파일명에 공백이나 한글이 들어 있습니다(예: <code>스크린샷 2026-...png</code>). 캡처·재생 시 깨질 수 있으므로, 해당 작품은 캡처 후 이미지가 정상 표시되는지 꼭 눈으로 확인합니다.</p>
+  <p>일부 작품은 이미지 파일명에 공백이나 한글이 들어 있습니다(예: <code>스크린샷 2026-...png</code>). 캡처 후 이미지가 정상 표시되는지 눈으로 확인합니다.</p>
   <div class="sub">인터랙티브 작품</div>
-  <p>클릭·스크롤·실시간 사운드 등 사용자 조작에 반응하는 작품은 자동 크롤링이 일부를 놓칠 수 있습니다. 이런 경우 ArchiveWeb.page 브라우저 확장으로 사람이 직접 조작하며 녹화하면 같은 WACZ로 시스템에 그대로 들어옵니다.</p>
+  <p>클릭·스크롤·실시간 사운드 등 사용자 조작에 반응하는 작품은 자동 캡처가 일부를 놓칠 수 있습니다. 이런 경우 ArchiveWeb.page 확장으로 사람이 직접 조작하며 녹화하면 같은 WACZ로 시스템에 그대로 들어옵니다(파일명을 <code>slug(이름)-slug(학기).wacz</code> 규칙에 맞춰 <code>wacz/&lt;학기&gt;/</code>에 넣습니다).</p>
   <div class="sub">외부 임베드(구글 슬라이드 등)</div>
   <p>로그인이나 외부 서비스에 의존하는 링크는 재생 충실도가 떨어질 수 있습니다. 가능하면 학생에게 자체 호스팅된 공개 URL을 받는 것이 좋습니다.</p>
   <div class="sub">저장 용량</div>
-  <p>영상·고해상도 에셋이 많으면 WACZ가 커집니다. 단일 파일이 너무 커지면 외부 객체저장소로 분리합니다.</p>
+  <p>영상·고해상도 에셋이 많으면 WACZ가 커집니다(작품당 수십~수백 MB). 학기가 쌓이면 폴더가 커지니 백업 매체 용량을 넉넉히 준비합니다. 참고로 <strong>캡처 시 큰 이미지는 자동으로 다운스케일·재압축</strong>되어(긴 변 2000px, JPEG 82) 용량이 크게 줍니다(실측 55MB→5MB). 원본 화질이 필요하면 캡처 전 <code>export ARCHIVE_OPTIMIZE=0</code>. 단, Google 슬라이드처럼 용량이 외부 서비스에서 오는 경우는 줄지 않습니다.</p>
 
   <div class="section-label">8. 부록</div>
   <div class="sub">8.1 폴더 구조</div>
-<pre>class-web-archive/
-├─ manifest.csv              단일 출처 (학생·작품·상태)
-├─ site/
-│  ├─ index.html             아카이브 목록 페이지
-│  ├─ viewer.html            개별 작품 재생 페이지
-│  ├─ app.js / styles.css    목록 렌더링 / 스타일
-│  ├─ index.json             빌드시 manifest로부터 생성
-│  ├─ replay/                replayweb.page (버전 고정, 자가호스팅)
-│  └─ wacz/&lt;학기&gt;/           재생용 WACZ (빌드시 모임)
-├─ tools/
-│  ├─ crawl_manifest.py      매니페스트 행 캡처
-│  ├─ build_index.py         manifest.csv → index.json
-│  └─ prepare_pages_wacz.py  WACZ를 site/wacz로 모음
-└─ .github/workflows/        archive.yml(캡처) / static.yml(배포)</pre>
+<pre>archivve/
+├─ index.html        공개 목록 (manifest.csv를 직접 읽음)
+├─ admin.html        운영 현황 (대기·비공개 포함 + 상태)
+├─ viewer.html       개별 작품 재생 페이지
+├─ manifest.csv      관리 원본 (모든 상태·결과)
+├─ replay/           replayweb.page (버전 고정, 자가호스팅)
+├─ wacz/&lt;학기&gt;/       재생용 WACZ
+├─ 캡처.command       접수 동기화 + 캡처 (더블클릭)
+├─ 보기.command       로컬 서버 + 브라우저 (더블클릭)
+└─ tools/
+   ├─ sync_manifest.py       구글 시트(접수) → manifest.csv
+   ├─ crawl_manifest.py      대기분 선별 → 캡처
+   ├─ capture_playwright.py  캡처 엔진 (Playwright→WARC→WACZ)
+   └─ serve.py               보기용 로컬 서버 (Range 지원 — 큰 WACZ 재생)</pre>
 
   <div class="sub">8.2 매니페스트 컬럼</div>
+  <p>왼쪽 = 사람이 편집하는 칸, 오른쪽 = 캡처가 자동으로 채우는 칸(건드리지 말 것).</p>
   <table>
-    <tr><th>컬럼</th><th>설명</th></tr>
-    <tr><td>student_name</td><td>학생 이름</td></tr>
-    <tr><td>title</td><td>작품 제목</td></tr>
-    <tr><td>original_url</td><td>원본 사이트 주소 (공개·로그인 불필요)</td></tr>
-    <tr><td>semester</td><td>학기 태그 (예: 2026-spring)</td></tr>
-    <tr><td>wacz_file</td><td>캡처 결과 파일명 (자동 생성)</td></tr>
-    <tr><td>wacz_url</td><td>재생용 주소 (빌드시 계산, 보통 비워둠)</td></tr>
-    <tr><td>archived_date</td><td>캡처 날짜</td></tr>
-    <tr><td>sha256</td><td>무결성 점검용 해시</td></tr>
-    <tr><td>status</td><td>ok / pending / recapture-needed / private</td></tr>
-    <tr><td>notes</td><td>비고 (교정 이력·주의사항 등)</td></tr>
+    <tr><th>컬럼</th><th>채우는 주체</th><th>설명</th></tr>
+    <tr><td>student_name</td><td>사람(접수)</td><td>학생 이름</td></tr>
+    <tr><td>semester</td><td>사람(접수)</td><td>학기 태그 (예: 2026-spring). 폴더 이름이 됨</td></tr>
+    <tr><td>title</td><td>사람</td><td>작품 제목</td></tr>
+    <tr><td>original_url</td><td>사람(접수)</td><td>원본 사이트 주소 (공개·로그인 불필요)</td></tr>
+    <tr><td>status</td><td>사람</td><td>ok / pending / recapture-needed / private</td></tr>
+    <tr><td>notes</td><td>사람</td><td>비고 (교정 이력·주의사항 등)</td></tr>
+    <tr><td>drive_link</td><td>사람(선택)</td><td>구글 드라이브 자료 링크 → 목록에 Drive 버튼</td></tr>
+    <tr><td>wacz_file</td><td>캡처 자동</td><td>캡처 결과 파일명 (<code>slug(이름)-slug(학기).wacz</code>)</td></tr>
+    <tr><td>archived_date</td><td>캡처 자동</td><td>캡처 날짜</td></tr>
+    <tr><td>sha256</td><td>캡처 자동</td><td>무결성 점검용 해시</td></tr>
   </table>
+  <p>실제로 손댈 칸은 왼쪽 6~7개뿐입니다. 오른쪽 3개는 캡처가 알아서 채웁니다. (안 쓰던 <code>type</code>·<code>wacz_url</code> 칸은 없앴습니다.)</p>
 
   <div class="footer rule-thin"></div>
-  <p class="footer">이 시스템의 미덕은 단순함입니다. 표준 포맷(WACZ) + 서버 없는 재생 + 텍스트 매니페스트 + 무료 정적 호스팅 — 네 가지 모두 "10년 뒤에도 그대로 열린다"에 베팅한 선택입니다. 복잡한 것이 없으므로 고장 날 것도, 매년 손볼 것도 거의 없습니다.</p>
+  <p class="footer">이 시스템의 미덕은 단순함입니다. 표준 포맷(WACZ) + 서버 없는 재생 + 텍스트 매니페스트 + 자족적 폴더 — 네 가지 모두 "10~20년 뒤에도 그대로 열린다"에 베팅한 선택입니다. 복잡한 것이 없으므로 고장 날 것도, 매년 손볼 것도 거의 없습니다.</p>
 
 </div>
 </body>
