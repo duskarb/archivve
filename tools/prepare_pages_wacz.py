@@ -83,7 +83,7 @@ def main() -> None:
     mirrored: set[tuple[str, str]] = set()
     with manifest.open(newline="", encoding="utf-8") as handle:
         for row in csv.DictReader(handle):
-            if clean(row.get("status")).lower() == "private":
+            if clean(row.get("status")).lower() in {"private", "hidden"}:
                 continue
 
             semester = clean(row.get("semester"))

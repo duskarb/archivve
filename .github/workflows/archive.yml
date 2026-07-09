@@ -47,6 +47,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Validate manifest
+        run: python3 tools/validate_manifest.py
+
       - name: Capture manifest rows
         env:
           SEMESTER: ${{ github.event.inputs.semester || '' }}

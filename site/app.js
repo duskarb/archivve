@@ -16,7 +16,13 @@ function clean(value) {
 }
 
 // 비공개/재캡처 대상은 외부 공개 색인에서 숨긴다.
-const HIDDEN_STATUSES = new Set(["recapture-needed", "private"]);
+const HIDDEN_STATUSES = new Set([
+  "pending",
+  "ready-to-capture",
+  "recapture-needed",
+  "private",
+  "hidden",
+]);
 
 function status(row) {
   return clean(row.status).toLowerCase() || "pending";

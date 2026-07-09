@@ -95,7 +95,7 @@ def should_capture(row: dict[str, str], semester: str, mode: str, match: str) ->
         return False
     if mode == "all":
         return True
-    return status in {"", "pending", "recapture-needed"}
+    return status in {"", "pending", "ready-to-capture", "recapture-needed"}
 
 
 def find_wacz(crawls_dir: Path, collection: str) -> Path:
@@ -154,9 +154,9 @@ def run_crawl(args: argparse.Namespace, row: dict[str, str], out_dir: Path) -> P
     row["wacz_file"] = wacz_file
     row["archived_date"] = datetime.now(timezone.utc).date().isoformat()
     row["sha256"] = sha256(target)
-    # 크롤 성공 시 바로 공개한다. 재생에 문제가 발견되면 운영자가 사후에
-    # recapture-needed로 내려 다음 실행에서 다시 캡처한다.
-    row["status"] = "ok"
+    # 캡처 성공과 재생 성공은 다르다. 운영자가 ReplayWeb.page에서 확인한 뒤
+    # ok 또는 partial로 올린다.
+    row["status"] = "review-needed"
     return target
 
 

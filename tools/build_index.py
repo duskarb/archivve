@@ -50,7 +50,7 @@ def main() -> None:
                     continue
                 normalized = {key: clean(value) for key, value in row.items()}
                 # 학생 요청/저작권/개인정보 비공개 항목은 공개 색인에 싣지 않는다.
-                if normalized.get("status", "").lower() == "private":
+                if normalized.get("status", "").lower() in {"private", "hidden"}:
                     continue
                 normalized["wacz_url"] = computed_wacz_url(normalized)
                 rows.append(normalized)

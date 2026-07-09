@@ -44,18 +44,48 @@ KAIST Industrial Design / Spring 2026
 ## 운영 워크플로우 (CSV → 자동 아카이브)
 
 1. 학생에게서 로그인 없이 접근 가능한 **공개 URL**을 받는다.
-2. `manifest.csv`에 한 줄 추가한다: 이름, 제목, URL, 학기(예: `2026-spring`).
-3. `status`를 비워 두거나 `pending`으로 둔다.
-4. 커밋·푸시하면 Actions가 `manifest.csv`를 읽고 pending 행만 자동으로 크롤링한다.
-5. 캡처가 끝난 행은 자동으로 `review-needed`가 되고, `wacz_file`,
+2. Google Sheet에서 수집하되, `@보기`, `@캡쳐` 같은 태그 대신 `status`
+   드롭다운을 쓴다.
+3. 캡처 준비가 된 행은 `ready-to-capture`로 둔다. URL이 아직 없으면
+   `pending`으로 둔다.
+4. 최종 CSV를 내려받아 `tools/manifest-editor.html`에서 열고 오류를 검수한다.
+5. `manifest.csv`에 반영한 뒤 커밋·푸시하면 Actions가 캡처 대상 행을 자동으로
+   크롤링한다.
+6. 캡처가 끝난 행은 자동으로 `review-needed`가 되고, `wacz_file`,
    `archived_date`, `sha256`이 채워진다.
-6. 캡처된 작품을 ReplayWeb.page에서 직접 열어 재생 품질을 확인한 뒤
+7. 캡처된 작품을 ReplayWeb.page에서 직접 열어 재생 품질을 확인한 뒤
    `status`를 갱신한다. **캡처 성공과 재생 성공은 다르다** — 자동 캡처 직후
    상태는 `review-needed`이며, 사람이 확인해야 `ok`가 된다.
-7. 그 학기 WACZ 묶음을 장기 저장소와 외부 백업에 복제한다(아래 백업 위치).
+8. 그 학기 WACZ 묶음을 장기 저장소와 외부 백업에 복제한다(아래 백업 위치).
 
 일상 운영에서는 GitHub Actions 화면을 직접 열 필요가 없다. `manifest.csv`가
 크롤링 큐 역할을 한다.
+
+### Google Sheet 편집 규칙
+
+Google Sheet는 협업과 링크 수집용으로 계속 쓴다. 다만 자유 태그 대신 아래처럼
+명시적인 컬럼을 유지한다.
+
+```text
+student_name,title,original_url,semester,wacz_file,wacz_url,archived_date,sha256,status,notes
+```
+
+`status` 컬럼은 데이터 유효성 검사 드롭다운으로 제한한다.
+
+```text
+pending
+ready-to-capture
+review-needed
+ok
+partial
+recapture-needed
+private
+```
+
+학기 말 또는 캡처 직전에는 Sheet에서 CSV를 내려받아
+`tools/manifest-editor.html`을 브라우저로 열고 `Load CSV`로 불러온다. 기존
+`@보기`, `@캡쳐` 태그가 남아 있으면 `Convert @ Tags`로 상태값으로 변환한 뒤
+`Download CSV`로 저장한다.
 
 ## 첫 크롤링 테스트
 
@@ -83,13 +113,17 @@ KAIST Industrial Design / Spring 2026
 
 | status | 의미 | 공개 여부 |
 |---|---|---|
-| `ok` | 재생 확인 완료 | 공개 (재생 가능) |
+| `pending` | URL 대기 또는 아직 작업 전 | 숨김 |
+| `ready-to-capture` | URL 있음, 다음 자동 캡처 대상 | 숨김 |
 | `review-needed` | 자동 캡처는 됐지만 사람이 확인해야 함 | 목록에 표시, Review 재생 가능 |
+| `ok` | 재생 확인 완료 | 공개 (재생 가능) |
 | `partial` | 일부 리소스/인터랙션 누락 | 공개, `notes`에 주석 필수 |
 | `recapture-needed` | 다시 캡처해야 함 (다음 실행 시 자동 재캡처) | 숨김 |
 | `private` | 학생 요청/저작권/개인정보 문제 | 비공개 (캡처·색인 모두 제외) |
 
-빈 status 또는 `pending`은 아직 캡처 전이라는 뜻이며 다음 실행 때 캡처된다.
+빈 status는 `pending`과 동일하게 취급한다. 자동 캡처 대상은
+`ready-to-capture`, `recapture-needed`, 그리고 과거 호환을 위한 빈 값/`pending`
+행이다.
 
 ## 인수인계 안내
 
