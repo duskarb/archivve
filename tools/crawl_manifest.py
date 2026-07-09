@@ -89,7 +89,7 @@ def should_capture(row: dict[str, str], semester: str, mode: str, match: str) ->
     status = clean(row.get("status")).lower()
     if not clean(row.get("original_url")):
         return False
-    if status in {"private", "hidden"}:
+    if status == "hidden":
         return False
     if semester and clean(row.get("semester")) != semester:
         return False
@@ -97,7 +97,7 @@ def should_capture(row: dict[str, str], semester: str, mode: str, match: str) ->
         return False
     if mode == "all":
         return True
-    return status in {"", "pending", "ready-to-capture", "recapture-needed"}
+    return status in {"", "pending", "recapture-needed"}
 
 
 def run_crawl(args: argparse.Namespace, row: dict[str, str], out_dir: Path) -> Path:

@@ -405,7 +405,7 @@
 
     function needsCapture(row) {
       const status = clean(row.status).toLowerCase();
-      return status === "" || status === "pending" || status === "ready-to-capture" || status === "recapture-needed";
+      return status === "" || status === "pending" || status === "recapture-needed";
     }
 
     function slugify(value) {

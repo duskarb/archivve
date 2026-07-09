@@ -14,16 +14,18 @@ ROOT = Path(__file__).resolve().parents[1]
 ALLOWED_STATUSES = {
     "",
     "pending",
-    "ready-to-capture",
     "review-needed",
     "ok",
     "partial",
     "recapture-needed",
-    "private",
     "hidden",
 }
+# 예전에 쓰던 값 → 지금 값. 옛 CSV를 검사할 때 바꿀 값을 알려준다.
+LEGACY_STATUSES = {
+    "ready-to-capture": "pending",
+    "private": "hidden",
+}
 URL_REQUIRED_STATUSES = {
-    "ready-to-capture",
     "review-needed",
     "ok",
     "partial",
@@ -71,7 +73,9 @@ def main() -> None:
                 errors.append(f"{label}: student_name is empty")
             if not semester:
                 errors.append(f"{label}: semester is empty")
-            if status not in ALLOWED_STATUSES:
+            if status in LEGACY_STATUSES:
+                errors.append(f"{label}: status '{status}' is retired; use '{LEGACY_STATUSES[status]}'")
+            elif status not in ALLOWED_STATUSES:
                 errors.append(f"{label}: unknown status '{status}'")
             if status in URL_REQUIRED_STATUSES and not url:
                 errors.append(f"{label}: original_url is required for status '{status}'")

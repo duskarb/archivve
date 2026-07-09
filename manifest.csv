@@ -1,5 +1,5 @@
 student_name,semester,title,original_url,status,notes,drive_link,wacz_file,archived_date,sha256
-Seohyeon Gu,2026-spring,Chess,https://gsh0407.github.io/Chess-/,ok,"URL ok, but WACZ file was missing — needs capture.",,seohyeon-gu-2026-spring.wacz,2026-07-09,b849af25b89ad6f383d573a0f757a600729e8484bfbdedb2e6c8554f1307107a
+Seohyeon Gu,2026-spring,Chess,https://gsh0407.github.io/Chess-/,ok,,,seohyeon-gu-2026-spring.wacz,2026-07-09,b849af25b89ad6f383d573a0f757a600729e8484bfbdedb2e6c8554f1307107a
 Jaejun Youn,2026-spring,Protocol,https://yjj8895-git.github.io/protocol/,ok,,,jaejun-youn-2026-spring.wacz,2026-07-09,1e828d54eb01cc6854dc84e749ef59b32654ce1c658e0e0e626099cac88e1432
 Yul Jeong,2026-spring,Decision & Action - Protocol,https://wjddbf0601.github.io/protocol-project/lastday.html,ok,URL verified live (title matches) — ready to capture.,,yul-jeong-2026-spring.wacz,2026-07-09,fa88bc5354dbbce0cf1639e2ac54a8926b55b4a100dbdf242b356c7604e13d8e
 Shakhzoda,2026-spring,Stepping Stone Path,https://shakhzoda006.github.io/stepping-stone-path/,ok,,,shakhzoda-2026-spring.wacz,2026-07-09,27671c6e5180b3a8a3cc13cd536256a1809a9d5524a87f98c3f23e1545a2b653
