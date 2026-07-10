@@ -431,17 +431,24 @@
     }
 
     // 재생 소스는 항상 로컬 상대경로 wacz/<semester>/<file> 로 계산한다.
+    // ReplayWeb은 source URL을 키로 브라우저 DB에 컬렉션을 보관한다. 같은 파일명으로
+    // 재캡처했을 때 이전 인덱스를 재사용하지 않도록 manifest 해시를 버전으로 붙인다.
+    function waczSource(row) {
+      const path = `wacz/${clean(row.semester)}/${waczFile(row)}`;
+      const version = clean(row.sha256) || clean(row.archived_date);
+      return version ? `${path}?v=${encodeURIComponent(version)}` : path;
+    }
+
     // 캡처가 안 된 행(대기)은 실제 파일이 없으므로 재생 버튼을 만들지 않는다.
     function archiveUrl(row) {
       const status = clean(row.status).toLowerCase();
       if (!clean(row.wacz_file)) return "";
       if (state.mode !== "all" && !["ok", "partial"].includes(status)) return "";
-      const source = `wacz/${clean(row.semester)}/${waczFile(row)}`;
       const params = new URLSearchParams({
         title: clean(row.title) || clean(row.original_url),
         student: clean(row.student_name),
         url: clean(row.original_url),
-        source,
+        source: waczSource(row),
       });
       return `${VIEWER_URL}?${params.toString()}`;
     }
