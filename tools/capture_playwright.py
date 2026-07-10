@@ -11,15 +11,17 @@ WARC로 기록한 뒤 wacz 패키지로 WACZ를 만든다. browsertrix와 같은
 from __future__ import annotations
 
 import hashlib
+import html
 import json
 import os
+import re
 import subprocess
 import sys
 import tempfile
 from datetime import datetime, timezone
 from io import BytesIO
 from pathlib import Path
-from urllib.parse import urldefrag, urlsplit
+from urllib.parse import urldefrag, urljoin, urlsplit
 
 from warcio.statusandheaders import StatusAndHeaders
 from warcio.warcwriter import WARCWriter
@@ -93,15 +95,117 @@ async () => {
 }
 """
 
+# JavaScript가 클릭 뒤에만 img.src를 지정하는 경우에도 파일을 안전하게 로드한다.
+# 버튼 자체를 누르지 않으므로 폼 제출이나 기타 라이브 사이트 부작용은 만들지 않는다.
+_PRELOAD_IMAGES = """
+async (urls) => {
+  await Promise.all(urls.map(url => new Promise(resolve => {
+    const image = new Image();
+    const done = () => resolve();
+    image.onload = done;
+    image.onerror = done;
+    image.src = url;
+    setTimeout(done, 10000);
+  })));
+}
+"""
 
-def _scope_prefix(url: str) -> str:
+
+_SCRIPT_NAVIGATION_PATTERNS = tuple(re.compile(pattern, re.IGNORECASE) for pattern in (
+    # Inline click handlers and scripts that replace the current page.
+    r"(?:window\s*\.\s*)?(?:document\s*\.\s*)?location(?:\s*\.\s*href)?\s*=\s*"
+    r"(?P<quote>['\"`])(?P<url>.+?)(?P=quote)",
+    r"(?:window\s*\.\s*)?(?:document\s*\.\s*)?location\s*\.\s*"
+    r"(?:assign|replace)\s*\(\s*(?P<quote>['\"`])(?P<url>.+?)(?P=quote)",
+    # New-window navigation is still replayable when its destination is archived.
+    r"window\s*\.\s*open\s*\(\s*(?P<quote>['\"`])(?P<url>.+?)(?P=quote)",
+    # Common History API and SPA router forms.
+    r"history\s*\.\s*(?:pushState|replaceState)\s*\(\s*[^,]*,\s*[^,]*,\s*"
+    r"(?P<quote>['\"`])(?P<url>.+?)(?P=quote)",
+    r"(?:router\s*\.\s*(?:push|replace)|navigate)\s*\(\s*"
+    r"(?P<quote>['\"`])(?P<url>.+?)(?P=quote)",
+))
+
+_STATIC_IMAGE_PATTERNS = tuple(re.compile(pattern, re.IGNORECASE) for pattern in (
+    # Literal paths in JS data, such as { image: "images/stone2.jpg" }.
+    r"(?P<quote>['\"`])(?P<url>[^'\"`\r\n]+?\."
+    r"(?:avif|gif|jpe?g|png|svg|webp)(?:\?[^'\"`\r\n]*)?)(?P=quote)",
+    # CSS background images in inline/external styles.
+    r"url\(\s*(?P<quote>['\"]?)(?P<url>[^)'\"\r\n]+?\."
+    r"(?:avif|gif|jpe?g|png|svg|webp)(?:\?[^)'\"\r\n]*)?)(?P=quote)\s*\)",
+))
+
+
+def _origin(url: str) -> str:
     parts = urlsplit(url)
-    path = parts.path.rsplit("/", 1)[0] + "/" if "/" in parts.path else "/"
-    return f"{parts.scheme}://{parts.netloc}{path}"
+    if parts.scheme.lower() not in {"http", "https"} or not parts.netloc:
+        return ""
+    return f"{parts.scheme.lower()}://{parts.netloc.lower()}"
 
 
-def _in_scope(url: str, prefix: str) -> bool:
-    return url.startswith(prefix)
+def _normalize_page_url(value: str, base_url: str) -> str:
+    """Resolve a discovered navigation target and discard non-web/dynamic values."""
+    value = html.unescape((value or "").strip())
+    if not value or "${" in value or value.startswith(("#", "javascript:", "mailto:", "tel:")):
+        return ""
+    target = urldefrag(urljoin(base_url, value)).url
+    return target if _origin(target) else ""
+
+
+def _extract_script_navigation_urls(source: str, base_url: str) -> list[str]:
+    """Extract literal destinations used by buttons and client-side routers."""
+    found: list[str] = []
+    seen: set[str] = set()
+    for pattern in _SCRIPT_NAVIGATION_PATTERNS:
+        for match in pattern.finditer(source or ""):
+            target = _normalize_page_url(match.group("url"), base_url)
+            if target and target not in seen:
+                seen.add(target)
+                found.append(target)
+    return found
+
+
+def _extract_static_image_urls(source: str, base_url: str) -> list[str]:
+    """Extract literal image paths that may only be assigned after interaction."""
+    found: list[str] = []
+    seen: set[str] = set()
+    for pattern in _STATIC_IMAGE_PATTERNS:
+        for match in pattern.finditer(source or ""):
+            target = _normalize_page_url(match.group("url"), base_url)
+            if target and target not in seen:
+                seen.add(target)
+                found.append(target)
+    return found
+
+
+def _discover_page_targets(page, page_url: str) -> tuple[list[str], list[str]]:
+    """Return ordinary DOM links and explicit script-driven navigation targets."""
+    try:
+        raw_links = page.eval_on_selector_all(
+            "a[href], area[href], form[action], button[formaction], "
+            "input[formaction], [data-href]",
+            "els => els.map(e => e.href || e.action || e.formAction || e.dataset.href)",
+        )
+    except Exception:  # noqa: BLE001
+        raw_links = []
+
+    links: list[str] = []
+    seen: set[str] = set()
+    for value in raw_links:
+        target = _normalize_page_url(value, page_url)
+        if target and target not in seen:
+            seen.add(target)
+            links.append(target)
+
+    try:
+        source = page.content()
+    except Exception:  # noqa: BLE001
+        source = ""
+    return links, _extract_script_navigation_urls(source, page_url)
+
+
+def _in_scope(url: str, allowed_origins: set[str]) -> bool:
+    return _origin(url) in allowed_origins
 
 
 def _write_record(writer: WARCWriter, response, body: bytes, content_type: str) -> None:
@@ -134,7 +238,8 @@ def _write_record(writer: WARCWriter, response, body: bytes, content_type: str) 
 def _capture_to_warc(seed_url: str, warc_path: Path, page_limit: int, depth: int):
     from playwright.sync_api import sync_playwright
 
-    prefix = _scope_prefix(seed_url)
+    seed_url = _normalize_page_url(seed_url, seed_url)
+    allowed_origins = {_origin(seed_url)}
     seen_resources: set[str] = set()
     visited_pages: set[str] = set()
     pages: list[dict] = []
@@ -172,6 +277,14 @@ def _capture_to_warc(seed_url: str, warc_path: Path, page_limit: int, depth: int
                     page.evaluate(_AUTOSCROLL)
                     page.wait_for_timeout(500)
                     page_title = page.title() or url
+
+                    # Hidden screens often contain an empty <img> whose source is only
+                    # assigned by JavaScript after clicking Next. Preload literal image
+                    # paths so their responses are included in the WARC as well.
+                    image_urls = _extract_static_image_urls(page.content(), page.url or url)
+                    if image_urls:
+                        page.evaluate(_PRELOAD_IMAGES, image_urls)
+                        page.wait_for_timeout(200)
                 except Exception as error:  # noqa: BLE001
                     print(f"    warn: {url} 로드 경고: {error}")
 
@@ -182,6 +295,7 @@ def _capture_to_warc(seed_url: str, warc_path: Path, page_limit: int, depth: int
                     "ts": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
                 })
 
+                resource_scripted_links: list[str] = []
                 for response in list(pending):
                     res_url = urldefrag(response.url).url
                     if not res_url.startswith(("http://", "https://")):
@@ -201,6 +315,15 @@ def _capture_to_warc(seed_url: str, warc_path: Path, page_limit: int, depth: int
                     original_len = len(body)
                     body, content_type = _optimize_image(content_type, body)
                     saved += original_len - len(body)
+                    if (
+                        "javascript" in content_type.lower()
+                        and _in_scope(res_url, allowed_origins)
+                    ):
+                        resource_scripted_links.extend(
+                            _extract_script_navigation_urls(
+                                body.decode("utf-8", errors="replace"), res_url
+                            )
+                        )
                     try:
                         _write_record(writer, response, body, content_type)
                         written += 1
@@ -208,15 +331,20 @@ def _capture_to_warc(seed_url: str, warc_path: Path, page_limit: int, depth: int
                         print(f"    warn: {res_url} 기록 실패: {error}")
 
                 if level < depth:
-                    try:
-                        links = page.eval_on_selector_all(
-                            "a[href]", "els => els.map(e => e.href)"
-                        )
-                    except Exception:  # noqa: BLE001
-                        links = []
+                    links, scripted_links = _discover_page_targets(page, page.url or url)
                     for link in links:
-                        target = urldefrag(link).url
-                        if _in_scope(target, prefix) and target not in visited_pages:
+                        if _in_scope(link, allowed_origins) and link not in visited_pages:
+                            queue.append((link, level + 1))
+
+                    # A literal location/window.open/router target is an explicit part of
+                    # the work even when it lives on another host (for example a GitHub
+                    # Pages intro that opens its Vercel app). Admit that origin, then let
+                    # the normal depth/page limits bound any further crawl.
+                    for target in scripted_links + resource_scripted_links:
+                        target_origin = _origin(target)
+                        if target_origin:
+                            allowed_origins.add(target_origin)
+                        if target not in visited_pages:
                             queue.append((target, level + 1))
 
             browser.close()
