@@ -596,19 +596,27 @@
     const searchToggle = document.getElementById("search-toggle");
     const searchBox = document.getElementById("search-box");
 
-    searchToggle.addEventListener("click", () => {
-      const opening = searchBox.hidden;
-      searchBox.hidden = !opening;
-      searchToggle.setAttribute("aria-expanded", String(opening));
-      if (opening) {
-        search.focus();
-      } else if (state.query) {
-        // 검색바를 닫으면 숨은 필터가 남지 않게 검색어도 지운다.
+    function closeSearch() {
+      searchBox.hidden = true;
+      searchToggle.hidden = false;
+      searchToggle.setAttribute("aria-expanded", "false");
+      if (state.query) {
         search.value = "";
         state.query = "";
         state.page = 1;
         renderRows();
       }
+    }
+
+    searchToggle.addEventListener("click", () => {
+      searchToggle.hidden = true;
+      searchBox.hidden = false;
+      searchToggle.setAttribute("aria-expanded", "true");
+      search.focus();
+    });
+
+    search.addEventListener("blur", () => {
+      closeSearch();
     });
 
     search.addEventListener("input", (event) => {
