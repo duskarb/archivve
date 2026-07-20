@@ -135,6 +135,16 @@ _STATIC_IMAGE_PATTERNS = tuple(re.compile(pattern, re.IGNORECASE) for pattern in
     r"(?:avif|gif|jpe?g|png|svg|webp)(?:\?[^)'\"\r\n]*)?)(?P=quote)\s*\)",
 ))
 
+# Audio/video are usually fetched with Range requests (206 partial) or only after a
+# play/interaction, so the browser's own responses are partial or absent. We instead
+# find the media files referenced in the page and download each one in full.
+_MEDIA_EXT = "mp3|wav|m4a|aac|ogg|oga|opus|flac|weba|mp4|m4v|webm|mov"
+_STATIC_MEDIA_PATTERNS = tuple(re.compile(pattern, re.IGNORECASE) for pattern in (
+    # Literal media paths in JS data, such as { audio: "assets/audio/korean.mp3" }.
+    r"(?P<quote>['\"`])(?P<url>[^'\"`\r\n]+?\."
+    r"(?:" + _MEDIA_EXT + r")(?:\?[^'\"`\r\n]*)?)(?P=quote)",
+))
+
 
 def _origin(url: str) -> str:
     parts = urlsplit(url)
@@ -176,6 +186,76 @@ def _extract_static_image_urls(source: str, base_url: str) -> list[str]:
                 seen.add(target)
                 found.append(target)
     return found
+
+
+def _extract_media_urls(source: str, base_url: str) -> list[str]:
+    """Extract literal audio/video paths referenced in HTML or JS."""
+    found: list[str] = []
+    seen: set[str] = set()
+    for pattern in _STATIC_MEDIA_PATTERNS:
+        for match in pattern.finditer(source or ""):
+            target = _normalize_page_url(match.group("url"), base_url)
+            if target and target not in seen:
+                seen.add(target)
+                found.append(target)
+    return found
+
+
+def _dom_media_urls(page, page_url: str) -> list[str]:
+    """Read src/currentSrc off any <audio>, <video>, and <source> elements."""
+    try:
+        raw = page.eval_on_selector_all(
+            "audio, video, source",
+            "els => els.map(e => e.currentSrc || e.src || e.getAttribute('src') || '')",
+        )
+    except Exception:  # noqa: BLE001
+        raw = []
+
+    found: list[str] = []
+    seen: set[str] = set()
+    for value in raw:
+        target = _normalize_page_url(value, page_url)
+        if target and target not in seen:
+            seen.add(target)
+            found.append(target)
+    return found
+
+
+def _record_media(context, writer: WARCWriter, urls: list[str],
+                  seen_resources: set[str]) -> int:
+    """Download each media file in full (not a Range slice) and record a 200 response.
+
+    Adding the URLs to seen_resources means any partial (206) response the browser
+    already captured for the same file is skipped, so replay serves the whole file."""
+    written = 0
+    for url in urls:
+        target = urldefrag(url).url
+        if target in seen_resources:
+            continue
+        seen_resources.add(target)
+        try:
+            response = context.request.get(target, timeout=45000)
+        except Exception as error:  # noqa: BLE001
+            print(f"    warn: {target} 미디어 요청 실패: {error}")
+            continue
+        if not response.ok:
+            continue
+        try:
+            body = response.body()
+        except Exception as error:  # noqa: BLE001
+            print(f"    warn: {target} 미디어 본문 없음: {error}")
+            continue
+        headers = dict(response.headers)
+        content_type = headers.get("content-type", "")
+        try:
+            _write_full_response(
+                writer, target, response.status, response.status_text,
+                headers, body, content_type,
+            )
+            written += 1
+        except Exception as error:  # noqa: BLE001
+            print(f"    warn: {target} 미디어 기록 실패: {error}")
+    return written
 
 
 def _discover_page_targets(page, page_url: str) -> tuple[list[str], list[str]]:
@@ -233,6 +313,26 @@ def _write_record(writer: WARCWriter, response, body: bytes, content_type: str) 
     writer.write_record(
         writer.create_warc_record(url, "request", http_headers=req_headers)
     )
+
+
+def _write_full_response(writer: WARCWriter, url: str, status: int, status_text: str,
+                         resp_headers: dict, body: bytes, content_type: str) -> None:
+    """Write a synthetic 200-style response record from a direct (non-page) download."""
+    skip = _SKIP_HEADERS | {"content-type"}
+    headers = [(k, v) for k, v in resp_headers.items() if k.lower() not in skip]
+    if content_type:
+        headers.append(("Content-Type", content_type))
+    headers.append(("Content-Length", str(len(body))))
+    status_line = f"{status} {status_text or 'OK'}"
+    http_headers = StatusAndHeaders(status_line, headers, protocol="HTTP/1.1")
+    writer.write_record(writer.create_warc_record(
+        url, "response", payload=BytesIO(body), http_headers=http_headers
+    ))
+
+    req_headers = StatusAndHeaders(
+        f"GET {urlsplit(url).path or '/'} HTTP/1.1", [], is_http_request=True
+    )
+    writer.write_record(writer.create_warc_record(url, "request", http_headers=req_headers))
 
 
 def _capture_to_warc(seed_url: str, warc_path: Path, page_limit: int, depth: int):
@@ -294,6 +394,19 @@ def _capture_to_warc(seed_url: str, warc_path: Path, page_limit: int, depth: int
                     "title": page_title,
                     "ts": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
                 })
+
+                # Download referenced audio/video in full before their partial (206)
+                # page responses are recorded, so replay serves complete media files.
+                try:
+                    media_urls = _extract_media_urls(page.content(), page.url or url)
+                    media_urls += [
+                        target for target in _dom_media_urls(page, page.url or url)
+                        if target not in media_urls
+                    ]
+                    if media_urls:
+                        written += _record_media(context, writer, media_urls, seen_resources)
+                except Exception as error:  # noqa: BLE001
+                    print(f"    warn: {url} 미디어 캡처 경고: {error}")
 
                 resource_scripted_links: list[str] = []
                 for response in list(pending):
